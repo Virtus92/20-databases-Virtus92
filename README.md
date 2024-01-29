@@ -1,17 +1,18 @@
 # Thema des Kapitels
 
 ## Lernziele
-Der Teilnehmer/die Teilnehmerin kann nach erfolgreicher Absolvierung dieses Themas:
-- das Thema erklären
-- das Thema anwenden, indem ein 
+Der\*die Teilnehmer\*in kann nach erfolgreicher Absolvierung dieses Themas:
+- erklären, wie ein Programm mit einer Datenbank arbeitet (Begriffe wie Connection, Statement, ...)
+- ein Programm erstellen, das Daten in einer Datenbank (z.B. MySQL, Oracle, ...) verwaltet (INSERT, UPDATE, SELECT, DELETE, aber auch CREATE TABLE, CREATE DATABASE,ALTER TABLE, ...)
 - seinen/ihren Code erklären
+
+Weiters hat der\*die Teilnehmer\*in:
+- in seinem Code Exceptions ordentlich abgefangen
+- entsprechende Unittests erstellt, um die Methoden auf Funktionalität zu prüfen
 - seinen Code in GitHub einchecken
 
 ## Inhaltsverzeichnis
 
-1. [1. Kapitel - Beispiele in Markdown](chapter1.md)
-2. [2. Kapitel - Beispiel eines 2. Kapitels](chapter2.md)
-
-## Referenzen
-
-Hier kommt eine Liste von Links zu weiterführenden Inhalten (zB spezifische Inhalte, worauf man speziell achten muss, oder Inhalte, welche sich die Teilnehmer nur optional anschauen)
+1. [Problemstellung](00-problemstellung.md)
+1. [Datenbankverbingung und -abfrage](01-database-connection-and-request.md)
+1. [Aufgabenstellung](XX-aufgabenstellung.md)
