@@ -18,3 +18,7 @@ Weiters hat der\*die Teilnehmer\*in:
 1. [SQL-Abfrage absetzen](02-execute-request.md)
 1. [Sicherheit in Datenbanken](03-security-in-databases.md)
 1. [Aufgabenstellung](XX-aufgabenstellung.md)
+
+## weitere Referenzen
+
+- [Baeldung: Introduction to JDBC](https://www.baeldung.com/java-jdbc)

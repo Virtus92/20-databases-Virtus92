@@ -121,14 +121,41 @@ public void updateCoffeeSales(HashMap<String, Integer> salesForWeek) throws SQLE
         for (Map.Entry<String, Integer> e : salesForWeek.entrySet()) { // 
             updateSales.setInt(1, e.getValue().intValue());
             updateSales.setString(2, e.getKey());
-            updateSales.executeUpdate();
+            int rowsAffected = updateSales.executeUpdate();
 
             updateTotal.setInt(1, e.getValue().intValue());
             updateTotal.setString(2, e.getKey());
-            updateTotal.executeUpdate(); 
+            rowsAffected = updateTotal.executeUpdate(); 
             con.commit();
         }
+    }
+    catch(SQLException e){
+        con.rollback();
+    } finally{
         con.setAutoCommit(true); // Hier schalten wir den AutoCommit wieder ein. 
-        
     }
 ```
+
+## INSERT-Statements und AUTOINCREMENT-IDs
+
+Angenommen unsere Tabelle COFFEES hat folgende Attribute:
+- COF_ID: AUTOINCREMENT-ID
+- COF_NAME: Name
+- SALES: Verkäufe
+- TOTAL: Summe der Verkäufe
+
+Bei der Anlage eines neuen Eintrags in die Tabelle `COFFEES` wird die `COF_ID` automatisch von der Datenbank befühlt. Dadurch ist uns diese `COF_ID` im Programm nicht bekannt. Eine Möglichkeit, diese herauszufinden, besteht darin, die *`RETURN_GENERATED_KEYS`* zu nutzen. Diese werden  nach Ausführung des Statements von der Methode *`GeneratedKeys`* abgefragt und in ein `ResultSet` gespeichert. Das `ResultSet` wird auf dieselbe Art und Weise ausgelesen, wie das Ergebnis eines `SELECT`-Requests. 
+
+```java
+stmt.executeUpdate("INSERT INTO COFFEES (COF_NAME, SALES, TOTAL) VALUES ('BARISTA', 0, 0)",
+                    Statement.RETURN_GENERATED_KEYS);
+
+int autoIncKeyFromApi = -1;
+rs = stmt.getGeneratedKeys();
+if (rs.next()) {
+    autoIncKeyFromApi = rs.getInt(1); // Jede generierte ID auslesen. In diesem Beispiel wurde nur ein Datenset erstellt.
+} else {
+    throw new SQLException("Beim INSERT wurde keine Autoincrement-ID generiert");
+}
+```
+
