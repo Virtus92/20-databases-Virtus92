@@ -42,6 +42,18 @@ In Java kann man unter mehreren Möglichkeiten auswählen, wie wir mit der Daten
 - JDBC: ist eine API, um mit der jeweiligen Datenbank (in unserem Beispiel MySQL) zu kommunizieren. Mit JDBC können wir SQL-Abfragen absetzen. Der Hauptvorteil von JDBC ist, dass es am Anfang einfacher ist, zu verstehen. Aus diesem Grund präsentieren wir es hier.
 - JPA: ist eine Möglichkeit, die Datenbank in Objekten abzubilden. JPA ist ein Abstraktionslayer, das die Low Level-JDBC-Aufrufe versteckt und dadurch die Arbeit mit Datenbanken auf Dauer vereinfacht. Dies kann dann im Rahmen einer Vertiefung verwendet werden.
 
+Bevor wir den entsprechenden Driver laden können, müssen wir die entsprechende Dependency in das Projekt einbinden. Dies erfolgt in einem Maven-Projekt im *`POM-File`*:
+
+```xml
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>[entsprechende Versionsnummer]</version>
+</dependency>
+```
+
+Anschließend können wir mi der Anbindung der Datenbank anfangen:
+
 ```java
 import java.sql.*;
 import java.io.*;
