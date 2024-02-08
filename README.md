@@ -16,4 +16,5 @@ Weiters hat der\*die Teilnehmer\*in:
 1. [Problemstellung](00-problemstellung.md)
 1. [Datenbankverbingung](01-database-connection.md)
 1. [SQL-Abfrage absetzen](02-execute-request.md)
+1. [Sicherheit in Datenbanken](03-security-in-databases.md)
 1. [Aufgabenstellung](XX-aufgabenstellung.md)
