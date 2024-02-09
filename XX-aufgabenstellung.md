@@ -5,7 +5,7 @@
 Erstelle ein Programm, welches einen Haushalt mit Personen und Haustieren modelliert und in einer Datenbank persistent speichert.
 Hierfür sollen beliebig viele Haushalte angelegt werden können. Jeder Haushalt besteht aus 1 bis n Personen und jeder Person sind 0 bis m Haustiere zugeordnet.
 
-Es sollen die üblichen CRUD Methoden einer Datenbank nutzbar sein.
+Es sollen die üblichen CRUD Methoden einer Datenbank nutzbar sein. Verwende hierfür ein Interface!
 - *Create(Haushalt)*
 - *Create(Person, haushalt_id)*
 - *Create(Haustier, person_id)*
@@ -20,7 +20,7 @@ Es sollen die üblichen CRUD Methoden einer Datenbank nutzbar sein.
 - *Delete(haustier_id)*
 
 Zusätzlich noch eine Methode, welche sämtliche Haushalte in der Datenbank ausgibt:
-*List<Household> getAllHouseHolds();*
+- *List<Household> getAllHouseHolds();*
 
 Löse diese Aufgabe mittels einer MySQL Datenbank.
 
