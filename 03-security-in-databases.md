@@ -18,6 +18,10 @@ Weiters ist es für produktive Applikationen unbedingt notwendig, die Rechte des
 
 Ein User, der lediglich in der Datenbank `Users` Lese- und Schreiboperationen durchführen soll, soll auch ausschließlich diese Rechte haben (also hierfür den root-User zu verwenden, stellt eine Sicherheitslücke dar, die Angreifer\*innen mehr Angriffsmöglichkeiten bietet). Man könnte soweit gehen, dass man für eine Applikation mehrere Datenbankuser erstellt, die je nach Anwendungsfall verwendet werden.
 
+Zur Darstellung der Kreativität von Angreifer\*innen hier ein Beispiel:
+
+![Car Based SQL Injection](img/Auto-Code-Injection.png)
+
 **Zusammengefasst**:
 
 Es gibt viele mögliche Wege Daten so zu manipulieren, um entweder mehr Daten aus der Datenbank herauszubekommen oder Daten zu löschen bzw. zu verändern. 
