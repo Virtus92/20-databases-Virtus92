@@ -22,3 +22,4 @@ Weiters hat der\*die Teilnehmer\*in:
 ## weitere Referenzen
 
 - [Baeldung: Introduction to JDBC](https://www.baeldung.com/java-jdbc)
+- [GeeksForGeeks: Basic Database Operations Using C#](https://www.geeksforgeeks.org/basic-database-operations-using-c-sharp/)
