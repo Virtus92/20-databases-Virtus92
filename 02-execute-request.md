@@ -139,10 +139,10 @@ public void updateCoffeeSales(HashMap<String, Integer> salesForWeek) throws SQLE
 ## INSERT-Statements und AUTOINCREMENT-IDs
 
 Angenommen unsere Tabelle COFFEES hat folgende Attribute:
-- COF_ID: AUTOINCREMENT-ID
-- COF_NAME: Name
-- SALES: Verkäufe
-- TOTAL: Summe der Verkäufe
+- `COF_ID`: AUTOINCREMENT-ID
+- `COF_NAME`: Name
+- `SALES`: Verkäufe
+- `TOTAL`: Summe der Verkäufe
 
 Bei der Anlage eines neuen Eintrags in die Tabelle `COFFEES` wird die `COF_ID` automatisch von der Datenbank befühlt. Dadurch ist uns diese `COF_ID` im Programm nicht bekannt. Eine Möglichkeit, diese herauszufinden, besteht darin, die *`RETURN_GENERATED_KEYS`* zu nutzen. Diese werden  nach Ausführung des Statements von der Methode *`GeneratedKeys`* abgefragt und in ein `ResultSet` gespeichert. Das `ResultSet` wird auf dieselbe Art und Weise ausgelesen, wie das Ergebnis eines `SELECT`-Requests. 
 
