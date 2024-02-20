@@ -2,8 +2,8 @@
 
 Im letzten Kapitel haben wir gelernt, wie Daten aus Dateien ausgelesen bzw. in Dateien gespeichert werden. 
 
-Die am weitesten verbreitete Variante der Datenspeicherung sind aber Datenbanken. Sie speichern Daten in einer strukturierten Art und sind in der Regel dafür ausgelegt, dass die Daten schnell durchsuchbar sind.
+Am Weitesten verbreitet ist die Datenspeicherung in Datenbanken. Diese können sehr große Datenmengen in einer strukturierten Art speichern und sind in der Regel dafür ausgelegt, dass diese Daten schnell durchsuchbar sind und/oder besonders schnell geschrieben werden können.
 
-In diesem Kapitel wollen wir lernen, wie mit Datenbanken kommuniziert wird.
+Wie Datenbanken konzipiert und erstellt werden bzw. wie diese abgefragt werden, wird im Abschnitt Datenbanken gelehrt. Hier konzentrieren wir uns auf die Verwendung von Datenbanken.
 
 Zurück zur [Startseite](README.md)

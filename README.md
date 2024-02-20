@@ -1,15 +1,10 @@
 # Thema des Kapitels
 
 ## Lernziele
-Der\*die Teilnehmer\*in kann nach erfolgreicher Absolvierung dieses Themas:
-- erklären, wie ein Programm mit einer Datenbank arbeitet (Begriffe wie Connection, Statement, ...)
-- ein Programm erstellen, das Daten in einer Datenbank (z.B. MySQL, Oracle, ...) verwaltet (INSERT, UPDATE, SELECT, DELETE, aber auch CREATE TABLE, CREATE DATABASE,ALTER TABLE, ...)
-- seinen/ihren Code erklären
-
-Weiters hat der\*die Teilnehmer\*in:
-- in seinem Code Exceptions ordentlich abgefangen
-- entsprechende Unittests erstellt, um die Methoden auf Funktionalität zu prüfen
-- seinen Code in GitHub einchecken
+Der:die Teilnehmer:in kann nach erfolgreicher Absolvierung dieses Themas:
+- Erklären, wie ein Programm mit einer Datenbank arbeitet (Begriffe wie Connection, Statement, ...)
+- Ein Programm erstellen, das Daten in einer Datenbank (z.B. MySQL, Oracle, ...) verwaltet (INSERT, UPDATE, SELECT, DELETE, aber auch CREATE TABLE, CREATE DATABASE,ALTER TABLE, ...)
+- Erklären, was der Unterschied zwischen Daten in den Tabellen einer Datenbank und die Klassen für seine Business Logic ist.
 
 ## Inhaltsverzeichnis
 
