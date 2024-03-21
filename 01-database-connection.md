@@ -75,9 +75,10 @@ public class DBConnector{
     private String url = "jdbc:mysql://localhost:3306/db_name"; //URL zum lokalen MySQL-Server und Datenbank db_name
     private String username = "db_name_user";
     private String password = "pw_db_name_user";
-    private static Connection connection = null;
-
-    public static Connection getInstance() throws SQLException {
+    private static DBConnector connector = null;
+    private Connection connection;
+    
+    public DBConnector(){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver"); //Driver "com.mysql.cj.jdbc.Driver" laden
             connection = DriverManager.getConnection(url, user, pass); // Verbindung mit der Datenbank herstellen und in Variable connection speichern
@@ -86,10 +87,18 @@ public class DBConnector{
             throw new SQLException("Database Connection couldn't be established!", e);
         }
     }
+
+    public static Connection getInstance() throws SQLException {
+        if (connector == null){
+            connector = new DBConnector();
+        }else if (connection.isClosed()){
+            connector = new DBConnector();
+        }
+    }
 }
 ```
 
-Hier verwenden wir das **Design Pattern Singleton**. 
+Hier verwenden wir das Design Pattern `Singleton`. 
 
 Mehr Informationen dazu findest du hier: [Refactoring.Guru: Singleton Design Pattern](https://refactoring.guru/design-patterns/singleton/java/example)
 
