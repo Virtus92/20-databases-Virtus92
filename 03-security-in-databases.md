@@ -4,7 +4,7 @@
 
 Ein großer Nachteil der direkt abgesetzten Queries ist, dass der Einsatz von Variablen zu Sicherheitsproblemen führen kann, weil der Inhalt der Variablen insbesondere von Variablen des Typs String gegen **Code-Injection** nicht geschützt sind. 
 
-In Bezug auf Datenbanken-Requests geht es darum, dass einerseits der:die Entwickler:in nicht die volle Kontrolle über das abzusetzende SQL-Statement hat. Der:die Benutzer:in hat die Kontrolle über seine:ihre Eingabe und somit auf den Inhalt der Variablen, die in das SQL-Statement eingfügt werden. So kann er:sie versuchen, bewusst andere Eingaben zu tätigen, um die Einschränkungen des:r Entwickler:in zu umgehen. Man spricht hier von **Sode-Injection**.
+In Bezug auf Datenbanken-Requests geht es darum, dass einerseits der:die Entwickler:in nicht die volle Kontrolle über das abzusetzende SQL-Statement hat. Der:die Benutzer:in hat die Kontrolle über seine:ihre Eingabe und somit auf den Inhalt der Variablen, die in das SQL-Statement eingefügt werden. So kann er:sie versuchen, bewusst andere Eingaben zu tätigen, um die Einschränkungen des:r Entwickler:in zu umgehen. Man spricht hier von **Code-Injection**.
 
 Code-Injection könnte folgendermaßen aussehen: 
 
@@ -24,7 +24,7 @@ Ein wichtiger Schritt ist also, die Eingaben von Benutzer:innen sowohl client- a
 
 Weiters ist es für produktive Applikationen unbedingt notwendig, die Rechte des Datenbankusers so einzuschränken, dass dieser nur das tun darf, was er wirklich können soll. 
 
-Ein User, der lediglich in der Datenbank `Users` Lese- und Schreiboperationen durchführen soll, soll auch ausschließlich diese Rechte haben (also hierfür den root-User zu verwenden, stellt eine Sicherheitslücke dar, die Angreifer:innen mehr Angriffsmöglichkeiten bietet). Man könnte soweit gehen, dass man für eine Applikation mehrere Datenbankuser erstellt, die je nach Anwendungsfall verwendet werden.
+Ein User, der lediglich in der Datenbank `Users` Lese- und Schreiboperationen durchführen soll, soll auch ausschließlich diese Rechte haben (also hierfür den root-User zu verwenden, stellt eine Sicherheitslücke dar, die Angreifer:innen mehr Angriffsmöglichkeiten bietet). Man könnte so weit gehen, dass man für eine Applikation mehrere Datenbankuser erstellt, die je nach Anwendungsfall verwendet werden.
 
 Auch die Quelle, wo die Anfrage herkommen darf (lokal vs. Internet vs. bestimmte IP-Adressen) soll möglichst eingeschränkt werden.
 
@@ -43,5 +43,5 @@ Was kann man dagegen tun:
 - Datenbankuser hat genau jene Rechte, die er wirklich braucht!
     - Am besten ein Frontend-User, der lediglich Daten abfragen darf
     - und ein Backend-User, der Schreibrechte erhält.
-    - und ein eigener Benutzer für die Applikationsverwaltung, der CREATE TABLE usw. ausführen darf...
+    - und ein eigener Benutzer für die Applikationsverwaltung, der CREATE TABLE usw. ausführen darf ...
 - Datenbankuser darf sich ausschließlich von dort aus einloggen, wo er herkommen darf (idealerweise localhost, ansonsten bestimmte IP-Adresse/n)
