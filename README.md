@@ -9,11 +9,11 @@ Der:die Teilnehmer:in kann nach erfolgreicher Absolvierung dieses Themas:
 
 ## Inhaltsverzeichnis
 
-1. [Problemstellung](00-problemstellung.md)
-1. [Datenbankverbingung](01-database-connection.md)
-1. [SQL-Abfrage absetzen](02-execute-request.md)
-1. [Sicherheit in Datenbanken](03-security-in-databases.md)
-1. [Aufgabenstellung](XX-aufgabenstellung.md)
+1. [Problemstellung](content/00-problemstellung.md)
+1. [Datenbankverbingung](content/01-database-connection.md)
+1. [SQL-Abfrage absetzen](content/02-execute-request.md)
+1. [Sicherheit in Datenbanken](content/03-security-in-databases.md)
+1. [Aufgabenstellung](content/XX-aufgabenstellung.md)
 
 ## weitere Referenzen
 

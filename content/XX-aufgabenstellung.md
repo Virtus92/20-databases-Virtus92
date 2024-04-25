@@ -37,4 +37,4 @@ Der:die Teilnehmer:in hat:
 - entsprechende Unittests erstellt, um die Methoden auf Funktionalität zu prüfen
 - seinen:ihren Code in GitHub eingecheckt
 
-Zurück zur [Startseite](README.md)
+Zurück zur [Startseite](../README.md)

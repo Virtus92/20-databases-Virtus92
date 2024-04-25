@@ -6,4 +6,4 @@ Am Weitesten verbreitet ist die Datenspeicherung in Datenbanken. Diese können s
 
 Wie Datenbanken konzipiert und erstellt werden bzw. wie diese abgefragt werden, wird im Abschnitt Datenbanken gelehrt. Hier konzentrieren wir uns auf die Verwendung von Datenbanken.
 
-Zurück zur [Startseite](README.md)
+Zurück zur [Startseite](../README.md)

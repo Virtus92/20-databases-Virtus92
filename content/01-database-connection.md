@@ -28,11 +28,11 @@ Dazu benötigen wir entsprechende `Zugangsdaten`.
 Als Nächstes müssen wir uns für eine Methode entscheiden, wie wir mit der Datenbank arbeiten wollen:
 - direkt mit dem Protokoll der Datenbank: diesen Weg wählen die wenigsten, da zu kompliziert und sehr spezifisch
 
-![Beispiel Direktzugriff auf Datenbank](img/Beispiel%20mit%20Direktzugriff%20auf%20DB.png)
+![Beispiel Direktzugriff auf Datenbank](../img/Beispiel%20mit%20Direktzugriff%20auf%20DB.png)
 
 - mit bestehenden Libraries, die verschiedene Datenbanken unterstützen (z.B. JDBC für Java)
 
-![Beispiel Zugriff über Datenbank-Connector](img/Beispiel%20mit%20JDBC.png)
+![Beispiel Zugriff über Datenbank-Connector](../img/Beispiel%20mit%20JDBC.png)
 
 Als Nächstes müssen wir uns für einen Treiber entscheiden. Je Datenbanktyp gibt es entsprechende Treiber. Dieser spielt die Rolle eines **Übersetzers von den Standardoperationen in die für diese eine Datenbank spezifische Sprache**. 
 
@@ -60,7 +60,7 @@ Bevor wir den entsprechenden Driver laden können, müssen wir die entsprechende
 
 In IntelliJ müssen wir nach der Eintragung die Dependencies aktualisiert werden. Das erkennt man daran, dass die eingefügte Dependency in roter Schrift dargestellt wird. 
 
-Per Klick auf![Dependencies aktualisieren](img/maven-dependencies-aktualisieren.png) werden die Dependencies neu geladen.
+Per Klick auf![Dependencies aktualisieren](../img/maven-dependencies-aktualisieren.png) werden die Dependencies neu geladen.
 
 Anschließend können wir mit der Anbindung der Datenbank anfangen:
 
@@ -99,17 +99,16 @@ public class DBConnector{
 }
 ```
 
-Hier verwenden wir das Design Pattern `Singleton`. 
-
-Mehr Informationen dazu findest du hier: [Refactoring.Guru: Singleton Design Pattern](https://refactoring.guru/design-patterns/singleton/java/example)
-
 ### C#
+
+In C# gibt es genauso mehrere Varianten, wie auf eine Datenbank zugegriffen werden kann. Zwei der bekanntesten sind:
+- *`SqlConnection`*: ist eine API, um mit der jeweiligen Datenbank (in unserem Beispiel MSSQL) zu kommunizieren. Mit *`SqlCommand`* können wir SQL-Abfragen absetzen. Der Hauptvorteil von *`SqlCommand`* ist, dass es am Anfang einfacher ist, zu verstehen und, dass genau das passiert, was der Entwickler anfordert. Aus diesem Grund präsentieren wir es hier.
+- *`Linq`* Mit Linq kann man eine Datenbank in Objekten abbilden. Damit ist mehr automatisiert. Dies ist für Anfänger nicht optimal, um zu verstehen, wie die Arbeit mit Datenbank in C# erfolgt. Daher wird Linq hier nicht näher vorgestellt.
 
 ```csharp
 // C# 
 using System;
-using System.Data.Linq;
-using System.Linq;
+using System.Data.SqlClient
 
 class DBConnection
 {
@@ -141,5 +140,10 @@ class DBConnection
     }
 }
 ```
+[SqlConnection: Dokumentation](https://learn.microsoft.com/de-de/dotnet/api/system.data.sqlclient.sqlconnection?view=dotnet-plat-ext-8.0)
 
-Zurück zur [Startseite](README.md)
+Hier verwenden wir das Design Pattern `Singleton`.
+
+Mehr Informationen dazu findest du hier: [Refactoring.Guru: Singleton Design Pattern](https://refactoring.guru/design-patterns/singleton/java/example)
+
+Zurück zur [Startseite](../README.md)

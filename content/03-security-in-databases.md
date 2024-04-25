@@ -1,6 +1,6 @@
 # Datenbank-Exploits - Angriffe auf die Datenbank
 
-![Datenbank-Exploit-Darstellung](img/Database-Exploit.png)
+![Datenbank-Exploit-Darstellung](../img/Database-Exploit.png)
 
 Ein großer Nachteil der direkt abgesetzten Queries ist, dass der Einsatz von Variablen zu Sicherheitsproblemen führen kann, weil der Inhalt der Variablen insbesondere von Variablen des Typs String gegen **Code-Injection** nicht geschützt sind. 
 
@@ -12,7 +12,7 @@ In die Variable *`lastname`* könnte ein:e Benutzer:in statt `"Mair%"` z.B. `"'M
 
 Stellen Sie sich vor, was da passiert, wenn eine solche Abfrage auf der User-Tabelle stattfindet, die alle Benutzer:innen ihrer Website beinhaltet. Der:die Angreifer:in bekommt, alle vorhandenen Benutzer:innen-IDs und vermutlich noch einige sensible Informationen dazu.
 
-![mögliche Auswirkungen von Code-Injection](img/Code-Injection-Talk.png)
+![mögliche Auswirkungen von Code-Injection](../img/Code-Injection-Talk.png)
 
 Wie man an diesem Beispiel erkennen kann, können Angreifer:innen aufgrund nicht abgesicherter Statements vieles anrichten. 
 
@@ -30,7 +30,7 @@ Auch die Quelle, wo die Anfrage herkommen darf (lokal vs. Internet vs. bestimmte
 
 Zur Darstellung der Kreativität von Angreifer:innen hier ein Beispiel:
 
-![Car Based SQL Injection](img/Auto-Code-Injection.png)
+![Car Based SQL Injection](../img/Auto-Code-Injection.png)
 
 **Zusammengefasst**:
 
