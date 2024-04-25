@@ -48,11 +48,9 @@ In Java kann man unter mehreren Möglichkeiten auswählen, wie wir mit der Daten
 - `JDBC`: ist eine API, um mit der jeweiligen Datenbank (in unserem Beispiel MySQL) zu kommunizieren. Mit JDBC können wir SQL-Abfragen absetzen. Der Hauptvorteil von JDBC ist, dass es am Anfang einfacher ist, zu verstehen. Aus diesem Grund präsentieren wir es hier.
 - `JPA`: ist eine Möglichkeit, die Datenbank in Objekten abzubilden. JPA ist ein Abstraktionslayer, das die Low Level-JDBC-Aufrufe versteckt und dadurch die Arbeit mit Datenbanken auf Dauer vereinfacht. Diese Methode kann im Rahmen einer Vertiefung erlernt werden.
 
-Bevor wir den entsprechenden Driver laden können, müssen wir diesen in IntelliJ einbinden. Dies erfolgt in der `Project Structure` (`Strg + Alt + Umschalt + S`):
+##### Treiber einbinden
 
-![JAR in Projekt einbinden](../img/MySQL-Driver-einbinden.png)
-
-Alternativ, für Projekte, deren Dependencies von Maven verwaltet werden, müssen wir die entsprechende Dependency in das Projekt einbinden. Dies erfolgt in einem Maven-Projekt im *`pom.xml`*-File:
+Bevor wir den entsprechenden Driver laden können, müssen wir für Projekte, deren Dependencies von Maven verwaltet werden, die entsprechende Dependency in das Projekt einbinden. Dies erfolgt in einem Maven-Projekt im *`pom.xml`*-File:
 
 ```xml
 <dependency>
@@ -65,6 +63,14 @@ Alternativ, für Projekte, deren Dependencies von Maven verwaltet werden, müsse
 In IntelliJ müssen wir nach der Eintragung die Dependencies aktualisiert werden. Das erkennt man daran, dass die eingefügte Dependency in roter Schrift dargestellt wird. 
 
 Per Klick auf![Dependencies aktualisieren](../img/maven-dependencies-aktualisieren.png) werden die Dependencies neu geladen.
+
+Alternativ z.B. in IntelliJ-Projekten müssen wir den entsprechenden Driver einbinden. Dies erfolgt in der `Project Structure` (`Strg + Alt + Umschalt + S`) in den Modules-Dependencies:
+
+![JAR in Projekt einbinden](../img/MySQL-Driver-einbinden.png)
+
+ACHTUNG! Wird die Alternative Lösung in einem Projekt angewendet, besteht die Gefahr, dass diese Einbindung automatisch gelöscht wird, sobald die Dependencies der POM-Datei neu geladen werden.
+
+##### Datenbankverbindung aufbauen
 
 Anschließend können wir mit der Anbindung der Datenbank anfangen:
 
@@ -104,7 +110,7 @@ public class DBConnector{
 }
 ```
 
-### C#
+#### C#
 
 In C# gibt es genauso mehrere Varianten, wie auf eine Datenbank zugegriffen werden kann. Zwei der bekanntesten sind:
 - *`SqlConnection`*: ist eine API, um mit der jeweiligen Datenbank (in unserem Beispiel MSSQL) zu kommunizieren. Mit *`SqlCommand`* können wir SQL-Abfragen absetzen. Der Hauptvorteil von *`SqlCommand`* ist, dass es am Anfang einfacher ist, zu verstehen und, dass genau das passiert, was der Entwickler anfordert. Aus diesem Grund präsentieren wir es hier.
