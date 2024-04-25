@@ -48,13 +48,17 @@ In Java kann man unter mehreren Möglichkeiten auswählen, wie wir mit der Daten
 - `JDBC`: ist eine API, um mit der jeweiligen Datenbank (in unserem Beispiel MySQL) zu kommunizieren. Mit JDBC können wir SQL-Abfragen absetzen. Der Hauptvorteil von JDBC ist, dass es am Anfang einfacher ist, zu verstehen. Aus diesem Grund präsentieren wir es hier.
 - `JPA`: ist eine Möglichkeit, die Datenbank in Objekten abzubilden. JPA ist ein Abstraktionslayer, das die Low Level-JDBC-Aufrufe versteckt und dadurch die Arbeit mit Datenbanken auf Dauer vereinfacht. Diese Methode kann im Rahmen einer Vertiefung erlernt werden.
 
-Bevor wir den entsprechenden Driver laden können, müssen wir die entsprechende Dependency in das Projekt einbinden. Dies erfolgt in einem Maven-Projekt im *`POM-File`*:
+Bevor wir den entsprechenden Driver laden können, müssen wir diesen in IntelliJ einbinden. Dies erfolgt in der `Project Structure` (`Strg + Alt + Umschalt + S`):
+
+![JAR in Projekt einbinden](../img/MySQL-Driver-einbinden.png)
+
+Alternativ, für Projekte, deren Dependencies von Maven verwaltet werden, müssen wir die entsprechende Dependency in das Projekt einbinden. Dies erfolgt in einem Maven-Projekt im *`pom.xml`*-File:
 
 ```xml
 <dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>[entsprechende Versionsnummer]</version>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>[aktuelle Versionsnummer]</version>
 </dependency>
 ```
 
@@ -72,9 +76,10 @@ import java.io.*;
 
 public class DBConnector{
 
-    private String url = "jdbc:mysql://localhost:3306/db_name"; //URL zum lokalen MySQL-Server und Datenbank db_name
+    private String dbName = "db_name";
     private String username = "db_name_user";
     private String password = "pw_db_name_user";
+    private String url = "jdbc:mysql://localhost:3306/" + dbName; //URL zum lokalen MySQL-Server und Datenbank db_name
     private static DBConnector connector = null;
     private Connection connection;
     

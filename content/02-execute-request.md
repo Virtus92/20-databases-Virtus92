@@ -247,7 +247,6 @@ class DbRequests
         }
     }
 }
-
 ```
 
 ## INSERT-Statements und AUTOINCREMENT-IDs
@@ -321,3 +320,5 @@ class DbRequests
 ```
 
 In C# kann man anhand des SQL-Statements *`output INSERTED.ID`* abfragen, welche ID im Rahmen des INSERTs generiert wurde. Mit *`command.ExecuteScalar()`* liest man das Ergebnis aus.
+
+Zurück zur [Startseite](../README.md)
