@@ -18,7 +18,34 @@ Je nachdem, woher der Wert der Variable lastname herkommt, kann dieser Wert eine
 
 Z.B. wird der Wert in einem Textfeld in der Applikation eingegeben. Wie wird sichergestellt, dass der:die Benutzer:in nicht versucht mehr Informationen herauszubekommen, indem er:sie statt eines Nachnamen folgendes eingibt: ```'Mair%' OR 1 = 1```. Statt der einen Person würde der gesamte Inhalt der Tabelle ausgegeben werden.
 
+### DAO-Design Pattern
+
+Bevor wir der Datenbank Abfragen schicken müssen wir zuerst dafür sorgen, dass unsere Implementierung austauschbar bleibt bzw. die Flexibilität bietet, auf leichte Art und Weise andere Datenbanken einzubinden.  
+
+Dazu wurde das Design Pattern DAO (Data Access Object) entwickelt. Diese basiert auf das Konzept von Interfaces, welche die Business Logic von der Persistierung (Abfrage des Systems, wo die Daten gespeichert sind bzw. System, das die Daten dauerhaft speichert). In den folgenden Beispielen werden wir diese anwenden.
+
+Die DAO definiert in der Regel für eine Datenbank verschiedene *`CRUD-Methoden`*. In unserem Beispiel könnten wir z.B. folgende Methoden definieren:
+- Hinzufügen einer Person
+- Aktualisieren einer Person
+- Löschen einer Person anhand ihrer ID
+- Laden einer Person anhand ihrer ID
+- Suchen einer Person anhand von Vor- und Nachname
+- ...
+
+[Weitere Beispiele für DAO in Java](https://www.geeksforgeeks.org/data-access-object-pattern/)
+
 ### Java
+
+Wie oben angeführt definieren wir zuerst unser Interface:
+```java
+public interface PersonDAO{
+    public void getPersonsByLastname(String lastname);
+
+    public void updateCoffeeSales(HashMap<String, Integer> salesForWeek) throws SQLException;
+
+    public void insertBarista();  
+}
+```
 
 Java bietet zwar auch die Möglichkeit SQL-Requests direkt abzusetzen, allerdings ist dies nur dann sinnvoll, wenn die Abfrage keine variablen Werte beinhaltet.
 
@@ -31,29 +58,40 @@ Abgesehen davon, sind *`PreparedStatements`* in der Regel schneller als das oben
 ```java
 // Java
 
+import java.security.Permission;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
-class DbRequests{
+class PersonDAOMySQL implements PersonDAO {
 
-  public void getPersonsByLastname(String lastname){
-    try (PreparedStatement ps = DBConnector.getInstance().prepareStatement("SELECT Firstname, Lastname, Age, HeightInMeter FROM Person WHERE Lastname LIKE ?")) { // Definition des Statements mit Platzhaltern: '?'
-      ps.setString(1, lastname); // Zuweisung der Parameter, hier haben wir lediglich 1 Parameter
-      ResultSet rs = ps.executeQuery(); // Absetzen der Query
-      
-      // Hier wird das Ergebnis der Abfrage verarbeitet
-      while (rs.next()){ // Zugriff auf die nächste Zeile. Wird benötigt, auch wenn das Ergebnis nur 1 Zeile hat!
-        String firstName = rs.getString("Firstname"); // Zugriff auf die Spalte mit dem Namen "Firstname"
-        String lastName = rs.getString("Lastname"); // Zugriff auf die Spalte mit dem Namen "Lastname"
-        int age = rs.getInt(3); // Zugriff auf die 3. Spalte laut SELECT: Age
-        float heightInMeter = rs.getFloat(4); // Zugriff auf die 4. Spalte laut SELECT: HeightInMeter
-        System.out.println(firstName + ", " + lastName + ", Alter: " + age + ", Größe: " + heightInMeter);
-      }
-    } catch (SQLException e) {
-      System.err.println("Fehler bei der Datenbankabfrage");
-      e.printStackTrace();
+    public List<Person> getPersonsByLastname(String lastname) {
+        ArrayList<Person> persons = new ArrayList<>();
+        try (PreparedStatement ps = DBConnector.getInstance().prepareStatement("SELECT Firstname, Lastname, Age, HeightInMeter FROM Person WHERE Lastname LIKE ?")) { // Definition des Statements mit Platzhaltern: '?'
+            ps.setString(1, lastname); // Zuweisung der Parameter, hier haben wir lediglich 1 Parameter
+            ResultSet rs = ps.executeQuery(); // Absetzen der Query
+
+
+            // Hier wird das Ergebnis der Abfrage verarbeitet
+            while (rs.next()) { // Zugriff auf die nächste Zeile. Wird benötigt, auch wenn das Ergebnis nur 1 Zeile hat!
+                int id = rs.getInt("id");
+                String firstName = rs.getString("Firstname"); // Zugriff auf die Spalte mit dem Namen "Firstname"
+                String lastName = rs.getString("Lastname"); // Zugriff auf die Spalte mit dem Namen "Lastname"
+                int age = rs.getInt(3); // Zugriff auf die 3. Spalte laut SELECT: Age
+                float heightInMeter = rs.getFloat(4); // Zugriff auf die 4. Spalte laut SELECT: HeightInMeter
+
+                Person person = new Person(id, firstName, lastName, age, heightInMeter);
+                persons.add(person);
+            }
+        } catch (SQLException e) {
+            System.err.println("Fehler bei der Datenbankabfrage");
+            e.printStackTrace();
+            return null;
+        }
+        return persons;
     }
-  }
+
+    // hier müssen die weiteren Methoden des Interface implementiert
 }
 ```
 
@@ -82,17 +120,30 @@ Beim Auslesen des Ergebnisses wird darauf geachtet, dass die richtigen Datentype
 
 ### C#
 
-In C# ist es ähnlich. Der benötigte Objekttyp lautet: *`SqlCommand`* in Kombination mit *`SqlParameter`*.
+In C# ist es ähnlich. Wir definieren zuerst unser Interface:
+```c#
+public interface IPersonDAO{
+    public IList<Person> getPersonsByLastname(String lastname);
+
+    public void updateCoffeeSales(HashMap<String, Integer> salesForWeek) throws SQLException;
+
+    public void insertBarista();  
+}
+```
+
+
+Der benötigte Objekttyp lautet: *`SqlCommand`* in Kombination mit *`SqlParameter`*.
 
 ```csharp
 using System;
 using System.Data.SqlClient;
 using System.Linq;
 
-class DbRequests
+class PersonDAOMySQL: IPersonDAO
 {
-    public void GetPersonsByLastname(string lastname)
+    public IList<Person> GetPersonsByLastname(string lastname)
     {
+        IList<Person> persons = new List<Person>();
         try
         {
             string query = "SELECT Firstname, Lastname, Age, HeightInMeter FROM Person WHERE Lastname LIKE @Lastname"; // Verwende Platzhalter @Lastname
@@ -110,19 +161,20 @@ class DbRequests
                     // Iteriere durch die Ergebnisdaten und verarbeite sie
                     while (reader.Read())
                     {
-                        string firstName = reader["Firstname"].ToString();
-                        string lastName = reader["Lastname"].ToString();
-                        int age = Convert.ToInt32(reader["Age"]);
-                        double height = Convert.ToDouble(reader["HeightInMeter"]);
+                        Person person = new Person(Convert.ToInt32(reader["id"], 
+                                            reader["Firstname"].ToString(), 
+                                            reader["Lastname"].ToString(), 
+                                            Convert.ToInt32(reader["Age"]), 
+                                            Convert.ToDouble(reader["HeightInMeter"])
 
-                        // Hier kannst du mit den Daten arbeiten (z.B. Ausgabe, Verarbeitung usw.)
-                        Console.WriteLine($"{firstName}, {lastName}, Alter: {age}, Größe: {height}");
+                        persons.Add(person);
                     }
                 }
             }
             catch (SqlException ex)
             {
                 Console.WriteLine("Fehler bei der Datenbankabfrage: " + ex.Message);
+                return null;
             }
         }
     }
@@ -159,7 +211,7 @@ import java.sql.ResultSet;
 import java.util.Map;
 import java.util.HashMap;
 
-class DbRequests{
+class PersonDAOMySQL implements PersonDAO{
     public void updateCoffeeSales(HashMap<String, Integer> salesForWeek) throws SQLException {
         String updateString = "update COFFEES set SALES = ? where COF_NAME = ?";
         String updateStatement = "update COFFEES set TOTAL = TOTAL + ? where COF_NAME = ?";
@@ -185,6 +237,8 @@ class DbRequests{
             DBConnector.getInstance().setAutoCommit(true); // Hier schalten wir den AutoCommit wieder ein. 
         }
     }
+
+    // hier müssen die weiteren Methoden des Interface implementiert
 }
 ```
 
@@ -195,7 +249,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
-class DbRequests
+class PersonDAOMySQL: IPersonDAO
 {
     public void UpdateCoffeeSales(Dictionary<string, int> salesForWeek)
     {
@@ -267,7 +321,7 @@ import java.sql.ResultSet;
 import java.util.Map;
 import java.util.HashMap;
 
-class DbRequests{
+class PersonDAOMySQL implements PersonDAO{
     public void insertBarista(){
       stmt.executeUpdate("INSERT INTO COFFEES (COF_NAME, SALES, TOTAL) VALUES ('BARISTA', 0, 0)", Statement.RETURN_GENERATED_KEYS);
 
@@ -279,6 +333,8 @@ class DbRequests{
         throw new SQLException("Beim INSERT wurde keine Autoincrement-ID generiert");
       }       
     }
+
+    // hier müssen die weiteren Methoden des Interface implementiert
 }
 ```
 Hier wird anhand des Parameters *`Statement.RETURN_GENERATED_KEYS`* definiert, dass das Statement die von der Datenbank automatisch definierte ID zurückgegeben wird. Mit *`stmt.getGeneratedKeys()`* kann die ID anschließend genauso abgefragt werden, wie mit einem SELECT-Statement.
@@ -289,7 +345,7 @@ Hier wird anhand des Parameters *`Statement.RETURN_GENERATED_KEYS`* definiert, d
 using System;
 using System.Data.SqlClient;
 
-class DbRequests
+class PersonDAOMySQL: IPersonDAO
 {
     public int InsertBarista()
     {
