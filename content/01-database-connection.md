@@ -53,11 +53,13 @@ In Java kann man unter mehreren Möglichkeiten auswählen, wie wir mit der Daten
 Bevor wir den entsprechenden Driver laden können, müssen wir für Projekte, deren Dependencies von Maven verwaltet werden, die entsprechende Dependency in das Projekt einbinden. Dies erfolgt in einem Maven-Projekt im *`pom.xml`*-File:
 
 ```xml
-<dependency>
-    <groupId>com.mysql</groupId>
-    <artifactId>mysql-connector-j</artifactId>
-    <version>[aktuelle Versionsnummer]</version>
-</dependency>
+<dependencies>
+    <dependency>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+        <version>[aktuelle Versionsnummer]</version>
+    </dependency>
+</dependencies>
 ```
 
 In IntelliJ müssen wir nach der Eintragung die Dependencies aktualisiert werden. Das erkennt man daran, dass die eingefügte Dependency in roter Schrift dargestellt wird. 
