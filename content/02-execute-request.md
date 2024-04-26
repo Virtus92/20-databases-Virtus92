@@ -11,12 +11,12 @@ Nachdem wir eine Verbindung mit der Datenbank erstellt, besteht die Arbeit mit D
 Stellen wir uns die folgende Abfrage vor:
 ```
 String lastname = "Mair%";
-String query = "SELECT Firstname, Lastname, Age, HeightInMeter FROM Person WHERE Lastname LIKE " + lastname;
+String query = "SELECT Firstname, Lastname, Age, HeightInMeter FROM Client WHERE Lastname LIKE " + lastname;
 ```
 
 Je nachdem, woher der Wert der Variable lastname herkommt, kann dieser Wert eine Sicherheitslücke darstellen: Gefahr von SQl-Injection.
 
-Z.B. wird der Wert in einem Textfeld in der Applikation eingegeben. Wie wird sichergestellt, dass der:die Benutzer:in nicht versucht mehr Informationen herauszubekommen, indem er:sie statt eines Nachnamen folgendes eingibt: ```'Mair%' OR 1 = 1```. Statt der einen Person würde der gesamte Inhalt der Tabelle ausgegeben werden.
+Z.B. wird der Wert in einem Textfeld in der Applikation eingegeben. Wie wird sichergestellt, dass der:die Benutzer:in nicht versucht mehr Informationen herauszubekommen, indem er:sie statt eines Nachnamen folgendes eingibt: ```'Mair%' OR 1 = 1```. Statt der einen Client würde der gesamte Inhalt der Tabelle ausgegeben werden.
 
 ### DAO-Design Pattern
 
@@ -25,11 +25,11 @@ Bevor wir der Datenbank Abfragen schicken müssen wir zuerst dafür sorgen, dass
 Dazu wurde das Design Pattern DAO (Data Access Object) entwickelt. Diese basiert auf das Konzept von Interfaces, welche die Business Logic von der Persistierung (Abfrage des Systems, wo die Daten gespeichert sind bzw. System, das die Daten dauerhaft speichert). In den folgenden Beispielen werden wir diese anwenden.
 
 Die DAO definiert in der Regel für eine Datenbank verschiedene *`CRUD-Methoden`*. In unserem Beispiel könnten wir z.B. folgende Methoden definieren:
-- Hinzufügen einer Person
-- Aktualisieren einer Person
-- Löschen einer Person anhand ihrer ID
-- Laden einer Person anhand ihrer ID
-- Suchen einer Person anhand von Vor- und Nachname
+- Hinzufügen eines Kunden
+- Aktualisieren der Kundendaten
+- Löschen eines Kunden anhand seiner ID
+- Laden eines Kunden anhand seiner ID
+- Suchen eines Kunden anhand von Vor- und Nachname
 - ...
 
 [Weitere Beispiele für DAO in Java](https://www.geeksforgeeks.org/data-access-object-pattern/)
@@ -38,12 +38,12 @@ Die DAO definiert in der Regel für eine Datenbank verschiedene *`CRUD-Methoden`
 
 Wie oben angeführt definieren wir zuerst unser Interface:
 ```java
-public interface PersonDAO{
-    public List<Person> getPersonsByLastname(String lastname);
+public interface ClientDAO{
+    public List<Client> getClientsByLastname(String lastname);
 
-    public void updatePerson(Person person);
+    public void deactivateClient(Client client);
 
-    public void addPerson(Person person);  
+    public int addClient(Client client);  
 }
 ```
 
@@ -63,11 +63,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 
-class PersonDAOMySQL implements PersonDAO {
+class ClientDAOMySQL implements ClientDAO {
 
-    public List<Person> getPersonsByLastname(String lastname) {
-        ArrayList<Person> persons = new ArrayList<>();
-        try (PreparedStatement ps = DBConnector.getInstance().prepareStatement("SELECT FIRSTNAME, LASTNAME, AGE, HEIGHTINMETER FROM PERSONS WHERE LASTNAME LIKE ?")) { // Definition des Statements mit Platzhaltern: '?'
+    public List<Client> getClientsByLastname(String lastname) {
+        ArrayList<Client> clients = new ArrayList<>();
+        try (PreparedStatement ps = DBConnector.getInstance().prepareStatement("SELECT ID, FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT FROM CLIENTS WHERE LASTNAME LIKE ?")) { // Definition des Statements mit Platzhaltern: '?'
             ps.setString(1, lastname); // Zuweisung der Parameter, hier haben wir lediglich 1 Parameter
             ResultSet rs = ps.executeQuery(); // Absetzen der Query
 
@@ -75,22 +75,22 @@ class PersonDAOMySQL implements PersonDAO {
             // Hier wird das Ergebnis der Abfrage verarbeitet
             while (rs.next()) { // Zugriff auf die nächste Zeile. Wird benötigt, auch wenn das Ergebnis nur 1 Zeile hat!
                 
-                // Die Werte werden hier ausschließlich des Verständnisses halber in Variablen gespeichert. Natürlich könnte man die rs.get-Abfragen direkt im "new Person"-Aufruf einsetzen
-                int id = rs.getInt("id");
-                String firstName = rs.getString("Firstname"); // Zugriff auf die Spalte mit dem Namen "Firstname"
-                String lastName = rs.getString("Lastname"); // Zugriff auf die Spalte mit dem Namen "Lastname"
-                int age = rs.getInt(3); // Zugriff auf die 3. Spalte laut SELECT: Age
-                float heightInMeter = rs.getFloat(4); // Zugriff auf die 4. Spalte laut SELECT: HeightInMeter
+                // Die Werte werden hier ausschließlich des Verständnisses halber in Variablen gespeichert. Natürlich könnte man die rs.get-Abfragen direkt im "new Client"-Aufruf einsetzen
+                int id = rs.getInt("ID");
+                String firstName = rs.getString("FIRSTNAME"); // Zugriff auf die Spalte mit dem Namen "FIRSTNAME"
+                String lastName = rs.getString("LASTNAME"); // Zugriff auf die Spalte mit dem Namen "LASTNAME"
+                boolean active = rs.getBoolean(3); // Zugriff auf die 3. Spalte laut SELECT: ACTIVE
+                float creditLimit = rs.getFloat(4); // Zugriff auf die 4. Spalte laut SELECT: CREDITLIMIT
 
-                Person person = new Person(id, firstName, lastName, age, heightInMeter);
-                persons.add(person);
+                Client client = new Client(id, firstName, lastName, active, creditLimit);
+                clients.add(client);
             }
         } catch (SQLException e) {
             System.err.println("Fehler bei der Datenbankabfrage");
             e.printStackTrace();
             return null;
         }
-        return persons;
+        return clients;
     }
 
     // hier müssen die weiteren Methoden des Interface implementiert
@@ -124,12 +124,12 @@ Beim Auslesen des Ergebnisses wird darauf geachtet, dass die richtigen Datentype
 
 In C# ist es ähnlich. Wir definieren zuerst unser Interface:
 ```c#
-public interface IPersonDAO{
-    public IList<Person> getPersonsByLastname(String lastname);
+public interface IClientDAO{
+    public IList<Client> getClientsByLastname(String lastname);
 
-    public void updatePerson(Person person);
+    public void deactivateClient(Client client);
 
-    public void addPerson(Person person);  
+    public void addClient(Client client);  
 }
 ```
 
@@ -141,14 +141,14 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 
-class PersonDAOMSSQL: IPersonDAO
+class ClientDAOMSSQL: IClientDAO
 {
-    public IList<Person> GetPersonsByLastname(string lastname)
+    public IList<Client> GetClientsByLastname(string lastname)
     {
-        IList<Person> persons = new List<Person>();
+        IList<Client> clients = new List<Client>();
         try
         {
-            string query = "SELECT FIRSTNAME, LASTNAME, AGE, HEIGHTINMETER FROM PERSONS WHERE LASTNAME LIKE @Lastname"; // Verwende Platzhalter @Lastname
+            string query = "SELECT ID, FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT FROM CLIENTS WHERE LASTNAME LIKE @Lastname"; // Verwende Platzhalter @Lastname
 
             // Erstelle ein SqlCommand-Objekt mit der Abfrage und der Verbindung
             using (SqlCommand command = new SqlCommand(query, DbConnector.GetInstance()))
@@ -163,13 +163,13 @@ class PersonDAOMSSQL: IPersonDAO
                     // Iteriere durch die Ergebnisdaten und verarbeite sie
                     while (reader.Read())
                     {
-                        Person person = new Person(Convert.ToInt32(reader["id"], 
-                                            reader["Firstname"].ToString(), 
-                                            reader["Lastname"].ToString(), 
-                                            Convert.ToInt32(reader["Age"]), 
-                                            Convert.ToDouble(reader["HeightInMeter"])
+                        Client client = new Client(Convert.ToInt32(reader["ID"], 
+                                            reader["FIRSTNAME"].ToString(), 
+                                            reader["LASTNAME"].ToString(), 
+                                            Convert.ToBoolean(reader["ACTIVE"]), 
+                                            Convert.ToDouble(reader["CREDITLIMIT"])
 
-                        persons.Add(person);
+                        clients.Add(client);
                     }
                 }
             }
@@ -179,7 +179,7 @@ class PersonDAOMSSQL: IPersonDAO
             Console.WriteLine("Fehler bei der Datenbankabfrage: " + ex.Message);
             return null;
         }
-        return persons;
+        return clients;
     }
 }
 
@@ -200,11 +200,9 @@ Siehe [Convert-Klasse: Dokumentation](https://learn.microsoft.com/de-de/dotnet/a
 
 ## Ändern von Einträgen
 
-Oben haben wir ein einfaches Beispiel dargelegt: ein *`SELECT`*-Statement. Jetzt wollen wir mehrere *`Update`*-Statements definieren.
+Oben haben wir ein einfaches Beispiel dargelegt: ein *`SELECT`*-Statement. Jetzt wollen wir mehrere *`UPDATE`*-Statements nacheinander ausführen.
 
-Nehmen wir das Beispiel der folgenden Methode, CoffeesTable.updateCoffeeSales. Diese speichert die Anzahl der in der aktuellen Woche verkauften Pfund Kaffee in der Spalte SALES für jede Kaffeesorte und
-aktualisiert die Gesamtzahl der verkauften Pfunde Kaffee in der Spalte TOTAL für jede
-Kaffeesorte:
+Nehmen wir das Beispiel der folgenden Methode, ClientDAOMySQL.updateClient. Diese speichert das Alter der Client in einem ersten Statement und die Größe der Client in einem 2. Statement. Um 
 
 ```java
 // Java
@@ -214,23 +212,23 @@ import java.sql.ResultSet;
 import java.util.Map;
 import java.util.HashMap;
 
-class PersonDAOMySQL implements PersonDAO{
-    public void updatePerson(Person person) {
-        String updateString = "update PERSONS set AGE = ? where ID = ?";
-        String updateStatement = "update PERSONS set HEIGHTINMETER = ? where ID = ?";
-        try (PreparedStatement updateSales = DBConnector.getInstance().prepareStatement(updateString);
-            PreparedStatement updateTotal = DBConnector.getInstance().prepareStatement(updateStatement)){
+class ClientDAOMySQL implements ClientDAO{
+    public void deactivateClient(Client client) {
+        String updateString = "update CLIENTS set ACTIVE = ? where ID = ?";
+        String updateStatement = "update CLIENTS set CREDITLIMIT = ? where ID = ?";
+        try (PreparedStatement updateActive = DBConnector.getInstance().prepareStatement(updateString);
+            PreparedStatement updateCreditLimit = DBConnector.getInstance().prepareStatement(updateStatement)){
 
             // Hier schalten wir den AutoCommit aus, um sicherzustellen, dass unsere beiden Updates im Rahmen einer Transaktion durchgeführt werden und unsere Daten in der Datenbank konsistent bleiben
-            DBConnector.getInstance().setAutoCommit(false); 
+            DBConnector.getInstance().setAutoCommit(false);
 
-            updateString.setInt(1, person.age);
-            updateString.setString(2, person.id);
-            updateString.executeUpdate();
+            updateActive.setInt(1, client.active);
+            updateActive.setString(2, client.id);
+            updateActive.executeUpdate();
 
-            updateStatement.setInt(1, person.heightInMeter);
-            updateStatement.setString(2, person.id);
-            updateStatement.executeUpdate(); 
+            updateCreditLimit.setInt(1, client.creditLimit);
+            updateCreditLimit.setString(2, client.id);
+            updateCreditLimit.executeUpdate(); 
             DBConnector.getInstance().commit();
         }
         catch(SQLException e){
@@ -245,18 +243,20 @@ class PersonDAOMySQL implements PersonDAO{
 }
 ```
 
+### C#
+
 ```csharp
 // C# 
 
 using System;
 using System.Data.SqlClient;
 
-class PersonDAOMSSQL: IPersonDAO
+class ClientDAOMSSQL: IClientDAO
 {
-    public void updatePerson(Person person)
+    public void deactivateClient(Client client)
     {
-        string updateString = "UPDATE PERSONS SET AGE = @Age WHERE ID = @Id";
-        string updateStatement = "UPDATE PERSONS SET HEIGHTINMETER = @HeightInMeter WHERE ID = @Id";
+        string updateActiveString = "update CLIENTS set ACTIVE = @Active WHERE ID = @Id";
+        string updateCreditLimitString = "update CLIENTS set CREDITLIMIT = @creditLimit WHERE ID = @Id";
 
         try{
             using (SqlConnection connection = DBConnector.Getinstance())
@@ -267,23 +267,23 @@ class PersonDAOMSSQL: IPersonDAO
                     try
                     {
                         // Erstes Update ausführen
-                        SqlCommand updateAgeCommand = new SqlCommand(updateString, connection, transaction);
-                        updateAgeCommand.Parameters.AddWithValue("@Age", person.Age);
-                        updateAgeCommand.Parameters.AddWithValue("@Id", person.Id);
-                        int rowsAffected = updateAgeCommand.ExecuteNonQuery();
+                        SqlCommand updateActiveCommand = new SqlCommand(updateActiveString, connection, transaction);
+                        updateActiveCommand.Parameters.AddWithValue("@Active", client.Active);
+                        updateActiveCommand.Parameters.AddWithValue("@Id", client.Id);
+                        int rowsAffected = updateActiveCommand.ExecuteNonQuery();
 
                         // Zweites Update ausführen
-                        SqlCommand updateHeightCommand = new SqlCommand(updateStatement, connection, transaction);
-                        updateHeightCommand.Parameters.AddWithValue("@HeightInMeter", person.HeightInMeter);
-                        updateHeightCommand.Parameters.AddWithValue("@Id", person.Id);
-                        rowsAffected = updateHeightCommand.ExecuteNonQuery();
+                        SqlCommand updateCreditLimitCommand = new SqlCommand(updateCreditLimitString, connection, transaction);
+                        updateCreditLimitCommand.Parameters.AddWithValue("@creditLimit", client.CreditLimit);
+                        updateCreditLimitCommand.Parameters.AddWithValue("@Id", client.Id);
+                        rowsAffected = updateCreditLimitCommand.ExecuteNonQuery();
 
                         // Transaktion bestätigen
                         transaction.Commit();
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Fehler beim Aktualisieren der Person: " + ex.Message);
+                        Console.WriteLine("Fehler beim Aktualisieren des Kunden: " + ex.Message);
                         // Transaktion rückgängig machen
                         transaction.Rollback();
                     }
@@ -300,39 +300,51 @@ class PersonDAOMSSQL: IPersonDAO
 
 ## INSERT-Statements und AUTOINCREMENT-IDs
 
-Angenommen unsere Tabelle COFFEES hat folgende Attribute:
-- `COF_ID`: AUTOINCREMENT-ID
-- `COF_NAME`: Name
-- `SALES`: Verkäufe
-- `TOTAL`: Summe der Verkäufe
+Angenommen unsere Tabelle `CLIENTS` hat folgende Attribute:
+- `ID`: AUTOINCREMENT-ID
+- `FIRSTNAME`: Vorname
+- `LASTNAME`: Nachname
+- `ACTIVE`: Ist der Kunde noch aktiv
+- `CREDITLIMIT`: Kreditlimit des Kunden
 
-Bei der Anlage eines neuen Eintrags in die Tabelle `COFFEES` wird die `COF_ID` automatisch von der Datenbank befühlt (`AUTOINCREMENT`). Dadurch ist uns diese `COF_ID` im Programm nicht bekannt. Eine Möglichkeit, diese herauszufinden, besteht darin, die *`RETURN_GENERATED_KEYS`* zu nutzen. Diese werden nach Ausführung des Statements von der Methode *`GeneratedKeys`* abgefragt und in ein `ResultSet` gespeichert. Das `ResultSet` wird auf dieselbe Art und Weise ausgelesen, wie das Ergebnis eines `SELECT`-Requests. 
+Bei der Anlage eines neuen Eintrags in die Tabelle `CLIENTS` wird die `ID` automatisch von der Datenbank befühlt (`AUTOINCREMENT`). Dadurch ist uns diese `ID` im Programm nicht bekannt. 
+
+### Java
+
+Eine Möglichkeit, diese in Java herauszufinden, besteht darin, die *`RETURN_GENERATED_KEYS`* zu nutzen. Diese werden nach Ausführung des Statements von der Methode *`GeneratedKeys`* abgefragt und in ein `ResultSet` gespeichert. Das `ResultSet` wird auf dieselbe Art und Weise ausgelesen, wie das Ergebnis eines `SELECT`-Requests.
 
 ```java
 // Java
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.HashMap;
 
-class PersonDAOMySQL implements PersonDAO{
-    public void addPerson(Person person){
-        addPersonStmt = "INSERT INTO PERSONS (FIRSTNAME, LASTNAME, AGE, HEIGHTINMETER) VALUES (?, ?, ?, ?)";
-        addPersonStmt.setString(1, person.firstname);
-        addPersonStmt.setString(2, person.lastname);
-        addPersonStmt.setInt(3, person.age);
-        addPersonStmt.setInt(4, person.heightInMeter);
-        
-        stmt.executeUpdate(addPersonStmt, Statement.RETURN_GENERATED_KEYS);
-    
+class ClientDAOMySQL implements ClientDAO {
+    public int addClient(Client client) {
+        addClientString = "INSERT INTO CLIENTS (FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT) VALUES (?, ?, ?, ?)";
         int autoIncKeyFromApi = -1;
-        rs = stmt.getGeneratedKeys();
-        if (rs.next()) {
-            autoIncKeyFromApi = rs.getInt(1); // Jede generierte ID auslesen. In diesem Beispiel wurde nur ein Datenset erstellt.
-        } else {
-            throw new SQLException("Beim INSERT wurde keine Autoincrement-ID generiert");
-        }       
+        
+        try (PreparedStatement addClientStmt = DBConnector.getInstance().prepareStatement(addClientString)) {
+            addClientStmt.setString(1, client.firstname);
+            addClientStmt.setString(2, client.lastname);
+            addClientStmt.setInt(3, client.active);
+            addClientStmt.setInt(4, client.creditLimit);
+
+            stmt.executeUpdate(addClientStmt, Statement.RETURN_GENERATED_KEYS);
+            
+            rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                autoIncKeyFromApi = rs.getInt(1); // Jede generierte ID auslesen. In diesem Beispiel wurde nur ein Datenset erstellt.
+            } else {
+                throw new SQLException("Beim INSERT wurde keine Autoincrement-ID generiert");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return autoIncKeyFromApi;
     }
 
     // hier müssen die weiteren Methoden des Interface implementiert
@@ -340,18 +352,20 @@ class PersonDAOMySQL implements PersonDAO{
 ```
 Hier wird anhand des Parameters *`Statement.RETURN_GENERATED_KEYS`* definiert, dass das Statement die von der Datenbank automatisch definierte ID zurückgegeben wird. Mit *`stmt.getGeneratedKeys()`* kann die ID anschließend genauso abgefragt werden, wie mit einem SELECT-Statement.
 
+### C#
+
 ```csharp
 // C# 
 
 using System;
 using System.Data.SqlClient;
 
-class PersonDAOMSSQL: IPersonDAO
+class ClientDAOMSSQL: IClientDAO
 {
-    public addPerson(Person person)
+    public addClient(Client client)
     {
-        // hier wird output INSERTED.ID verwendet, um die ID der eingefügten Person zurückzubekommen (funktioniert aber nur auf MSSQL 2005 und höher) 
-        string addPersonStmt = "INSERT INTO PERSONS (FIRSTNAME, LASTNAME, AGE, HEIGHTINMETER) output INSERTED.ID VALUES (@Firstname, @Lastname, @Age, @HeightInMeter)";
+        // hier wird output INSERTED.ID verwendet, um die ID der eingefügten Client zurückzubekommen (funktioniert aber nur auf MSSQL 2005 und höher) 
+        string addClientString = "INSERT INTO CLIENTS (FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT) output INSERTED.ID VALUES (@Firstname, @Lastname, @Active, @CreditLimit)";
         int autoIncKeyFromApi = -1;
         
         try
@@ -360,13 +374,12 @@ class PersonDAOMSSQL: IPersonDAO
             using (SqlConnection connection = DbConnector.GetInstance())
             {
                 // Erstelle das SqlCommand-Objekt für das Einfügen des Baristas
-                using (SqlCommand command = new SqlCommand(insertQuery, connection))
+                using (SqlCommand command = new SqlCommand(addClientString, connection))
                 {
-                    SqlCommand command = new SqlCommand(addPersonStmt, connection);
-                    command.Parameters.AddWithValue("@Firstname", person.Firstname);
-                    command.Parameters.AddWithValue("@Lastname", person.Lastname);
-                    command.Parameters.AddWithValue("@Age", person.Age);
-                    command.Parameters.AddWithValue("@HeightInMeter", person.HeightInMeter);
+                    command.Parameters.AddWithValue("@Firstname", client.Firstname);
+                    command.Parameters.AddWithValue("@Lastname", client.Lastname);
+                    command.Parameters.AddWithValue("@Active", client.Active);
+                    command.Parameters.AddWithValue("@CreditLimit", client.CreditLimit);
 
                     // Führe das Einfügen aus und erhalte die generierte ID
                     int autoIncKeyFromApi = Convert.ToInt32(command.ExecuteScalar());
@@ -380,15 +393,17 @@ class PersonDAOMSSQL: IPersonDAO
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Fehler beim Einfügen der Person in die Datenbank: " + e.Message);
+                    Console.WriteLine("Fehler beim Einfügen der Client in die Datenbank: " + e.Message);
                 }
             }
         }
-        return int autoIncKeyFromApi;
+        return autoIncKeyFromApi;
     }
 }
 ```
 
-In C# kann man anhand des SQL-Statements *`output INSERTED.ID`* abfragen, welche ID im Rahmen des INSERTs generiert wurde. Mit *`command.ExecuteScalar()`* liest man das Ergebnis aus.
+In C# kann man anhand des SQL-Statements `output INSERTED.ID` ab MSSQL 2005 abfragen, welche ID im Rahmen des INSERT generiert wurde. Mit `command.ExecuteScalar()` liest man das Ergebnis aus. 
+
+Mit älteren Versionen von MSSQL würde man stattdessen folgendes Statement verwenden: `INSERT INTO CLIENTS (FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT) VALUES (@Firstname, @Lastname, @Active, @CreditLimit); SELECT SCOPE_IDENTITY()`.
 
 Zurück zur [Startseite](../README.md)
