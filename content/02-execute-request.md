@@ -39,11 +39,11 @@ Die DAO definiert in der Regel für eine Datenbank verschiedene *`CRUD-Methoden`
 Wie oben angeführt definieren wir zuerst unser Interface:
 ```java
 public interface PersonDAO{
-    public void getPersonsByLastname(String lastname);
+    public List<Person> getPersonsByLastname(String lastname);
 
-    public void updateCoffeeSales(HashMap<String, Integer> salesForWeek) throws SQLException;
+    public void updatePerson(Person person);
 
-    public void insertBarista();  
+    public void addPerson(Person person);  
 }
 ```
 
@@ -67,13 +67,15 @@ class PersonDAOMySQL implements PersonDAO {
 
     public List<Person> getPersonsByLastname(String lastname) {
         ArrayList<Person> persons = new ArrayList<>();
-        try (PreparedStatement ps = DBConnector.getInstance().prepareStatement("SELECT Firstname, Lastname, Age, HeightInMeter FROM Person WHERE Lastname LIKE ?")) { // Definition des Statements mit Platzhaltern: '?'
+        try (PreparedStatement ps = DBConnector.getInstance().prepareStatement("SELECT FIRSTNAME, LASTNAME, AGE, HEIGHTINMETER FROM PERSONS WHERE LASTNAME LIKE ?")) { // Definition des Statements mit Platzhaltern: '?'
             ps.setString(1, lastname); // Zuweisung der Parameter, hier haben wir lediglich 1 Parameter
             ResultSet rs = ps.executeQuery(); // Absetzen der Query
 
 
             // Hier wird das Ergebnis der Abfrage verarbeitet
             while (rs.next()) { // Zugriff auf die nächste Zeile. Wird benötigt, auch wenn das Ergebnis nur 1 Zeile hat!
+                
+                // Die Werte werden hier ausschließlich des Verständnisses halber in Variablen gespeichert. Natürlich könnte man die rs.get-Abfragen direkt im "new Person"-Aufruf einsetzen
                 int id = rs.getInt("id");
                 String firstName = rs.getString("Firstname"); // Zugriff auf die Spalte mit dem Namen "Firstname"
                 String lastName = rs.getString("Lastname"); // Zugriff auf die Spalte mit dem Namen "Lastname"
@@ -125,9 +127,9 @@ In C# ist es ähnlich. Wir definieren zuerst unser Interface:
 public interface IPersonDAO{
     public IList<Person> getPersonsByLastname(String lastname);
 
-    public void updateCoffeeSales(HashMap<String, Integer> salesForWeek) throws SQLException;
+    public void updatePerson(Person person);
 
-    public void insertBarista();  
+    public void addPerson(Person person);  
 }
 ```
 
@@ -139,14 +141,14 @@ using System;
 using System.Data.SqlClient;
 using System.Linq;
 
-class PersonDAOMySQL: IPersonDAO
+class PersonDAOMSSQL: IPersonDAO
 {
     public IList<Person> GetPersonsByLastname(string lastname)
     {
         IList<Person> persons = new List<Person>();
         try
         {
-            string query = "SELECT Firstname, Lastname, Age, HeightInMeter FROM Person WHERE Lastname LIKE @Lastname"; // Verwende Platzhalter @Lastname
+            string query = "SELECT FIRSTNAME, LASTNAME, AGE, HEIGHTINMETER FROM PERSONS WHERE LASTNAME LIKE @Lastname"; // Verwende Platzhalter @Lastname
 
             // Erstelle ein SqlCommand-Objekt mit der Abfrage und der Verbindung
             using (SqlCommand command = new SqlCommand(query, DbConnector.GetInstance()))
@@ -171,12 +173,13 @@ class PersonDAOMySQL: IPersonDAO
                     }
                 }
             }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("Fehler bei der Datenbankabfrage: " + ex.Message);
-                return null;
-            }
         }
+        catch (SqlException ex)
+        {
+            Console.WriteLine("Fehler bei der Datenbankabfrage: " + ex.Message);
+            return null;
+        }
+        return persons;
     }
 }
 
@@ -212,27 +215,27 @@ import java.util.Map;
 import java.util.HashMap;
 
 class PersonDAOMySQL implements PersonDAO{
-    public void updateCoffeeSales(HashMap<String, Integer> salesForWeek) throws SQLException {
-        String updateString = "update COFFEES set SALES = ? where COF_NAME = ?";
-        String updateStatement = "update COFFEES set TOTAL = TOTAL + ? where COF_NAME = ?";
+    public void updatePerson(Person person) {
+        String updateString = "update PERSONS set AGE = ? where ID = ?";
+        String updateStatement = "update PERSONS set HEIGHTINMETER = ? where ID = ?";
         try (PreparedStatement updateSales = DBConnector.getInstance().prepareStatement(updateString);
             PreparedStatement updateTotal = DBConnector.getInstance().prepareStatement(updateStatement)){
-            
-            DBConnector.getInstance().setAutoCommit(false); // Hier schalten wir den AutoCommit aus, um sicherzustellen, dass all unsere beiden Updates im Rahmen einer Transaktion durchgeführt werden und unsere Daten in der Datenbank konsistent bleiben
 
-            for (Map.Entry<String, Integer> e : salesForWeek.entrySet()) { // 
-                updateSales.setInt(1, e.getValue().intValue());
-                updateSales.setString(2, e.getKey());
-                int rowsAffected = updateSales.executeUpdate();
+            // Hier schalten wir den AutoCommit aus, um sicherzustellen, dass unsere beiden Updates im Rahmen einer Transaktion durchgeführt werden und unsere Daten in der Datenbank konsistent bleiben
+            DBConnector.getInstance().setAutoCommit(false); 
 
-                updateTotal.setInt(1, e.getValue().intValue());
-                updateTotal.setString(2, e.getKey());
-                rowsAffected = updateTotal.executeUpdate(); 
-                DBConnector.getInstance().commit();
-            }
+            updateString.setInt(1, person.age);
+            updateString.setString(2, person.id);
+            updateString.executeUpdate();
+
+            updateStatement.setInt(1, person.heightInMeter);
+            updateStatement.setString(2, person.id);
+            updateStatement.executeUpdate(); 
+            DBConnector.getInstance().commit();
         }
         catch(SQLException e){
             DBConnector.getInstance().rollback();
+            e.printStackTrace();
         } finally{
             DBConnector.getInstance().setAutoCommit(true); // Hier schalten wir den AutoCommit wieder ein. 
         }
@@ -246,58 +249,50 @@ class PersonDAOMySQL implements PersonDAO{
 // C# 
 
 using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 
-class PersonDAOMySQL: IPersonDAO
+class PersonDAOMSSQL: IPersonDAO
 {
-    public void UpdateCoffeeSales(Dictionary<string, int> salesForWeek)
+    public void updatePerson(Person person)
     {
-        string updateSalesQuery = "UPDATE COFFEES SET SALES = @Sales WHERE COF_NAME = @CofName";
-        string updateTotalQuery = "UPDATE COFFEES SET TOTAL = TOTAL + @Sales WHERE COF_NAME = @CofName";
+        string updateString = "UPDATE PERSONS SET AGE = @Age WHERE ID = @Id";
+        string updateStatement = "UPDATE PERSONS SET HEIGHTINMETER = @HeightInMeter WHERE ID = @Id";
 
-        using (SqlConnection connection = DBConnector.Getinstance())
-        {
-            connection.Open();
-
-            // Beginne eine Transaktion
-            SqlTransaction transaction = connection.BeginTransaction();
-
-            try
+        try{
+            using (SqlConnection connection = DBConnector.Getinstance())
             {
-                foreach (KeyValuePair<string, int> entry in salesForWeek)
-                {
-                    // Erstelle und konfiguriere das SqlCommand-Objekt für das Update der Verkäufe
-                    using (SqlCommand updateSalesCommand = new SqlCommand(updateSalesQuery, connection, transaction))
+                // Beginne eine Transaktion
+                using (SqlTransaction transaction = connection.BeginTransaction()) {
+    
+                    try
                     {
-                        updateSalesCommand.Parameters.Add(new SqlParameter("@Sales"System.Data.SqlDbType.Int, entry.Value));
-                        updateSalesCommand.Parameters.Add(new SqlParameter("@CofName"System.Data.SqlDbType.VarChar, entry.Key));
+                        // Erstes Update ausführen
+                        SqlCommand updateAgeCommand = new SqlCommand(updateString, connection, transaction);
+                        updateAgeCommand.Parameters.AddWithValue("@Age", person.Age);
+                        updateAgeCommand.Parameters.AddWithValue("@Id", person.Id);
+                        int rowsAffected = updateAgeCommand.ExecuteNonQuery();
 
-                        // Führe das Update der Verkäufe aus
-                        updateSalesCommand.ExecuteNonQuery();
+                        // Zweites Update ausführen
+                        SqlCommand updateHeightCommand = new SqlCommand(updateStatement, connection, transaction);
+                        updateHeightCommand.Parameters.AddWithValue("@HeightInMeter", person.HeightInMeter);
+                        updateHeightCommand.Parameters.AddWithValue("@Id", person.Id);
+                        rowsAffected = updateHeightCommand.ExecuteNonQuery();
+
+                        // Transaktion bestätigen
+                        transaction.Commit();
                     }
-
-                    // Erstelle und konfiguriere das SqlCommand-Objekt für das Update des Gesamtverkaufs
-                    using (SqlCommand updateTotalCommand = new SqlCommand(updateTotalQuery, connection, transaction))
+                    catch (Exception ex)
                     {
-                        updateTotalCommand.Parameters.Add(new SqlParameter("@Sales"System.Data.SqlDbType.Int, entry.Value));
-                        updateTotalCommand.Parameters.Add(new SqlParameter("@CofName"System.Data.SqlDbType.VarChar, entry.Key));
-
-                        // Führe das Update des Gesamtverkaufs aus
-                        updateTotalCommand.ExecuteNonQuery();
+                        Console.WriteLine("Fehler beim Aktualisieren der Person: " + ex.Message);
+                        // Transaktion rückgängig machen
+                        transaction.Rollback();
                     }
                 }
-
-                // Commit der Transaktion, wenn alles erfolgreich war
-                transaction.Commit();
             }
-            catch (SqlException ex)
-            {
-                Console.WriteLine("Fehler bei der Datenbankabfrage: " + ex.Message);
-
-                // Rollback der Transaktion bei einem Fehler
-                transaction.Rollback();
-            }
+        }
+        catch ( Exception e)
+        {
+            Console.WriteLine("Fehler beim Verbinden mit der Datenbank: " + e.Message);
         }
     }
 }
@@ -322,16 +317,22 @@ import java.util.Map;
 import java.util.HashMap;
 
 class PersonDAOMySQL implements PersonDAO{
-    public void insertBarista(){
-      stmt.executeUpdate("INSERT INTO COFFEES (COF_NAME, SALES, TOTAL) VALUES ('BARISTA', 0, 0)", Statement.RETURN_GENERATED_KEYS);
-
-      int autoIncKeyFromApi = -1;
-      rs = stmt.getGeneratedKeys();
-      if (rs.next()) {
-        autoIncKeyFromApi = rs.getInt(1); // Jede generierte ID auslesen. In diesem Beispiel wurde nur ein Datenset erstellt.
-      } else {
-        throw new SQLException("Beim INSERT wurde keine Autoincrement-ID generiert");
-      }       
+    public void addPerson(Person person){
+        addPersonStmt = "INSERT INTO PERSONS (FIRSTNAME, LASTNAME, AGE, HEIGHTINMETER) VALUES (?, ?, ?, ?)";
+        addPersonStmt.setString(1, person.firstname);
+        addPersonStmt.setString(2, person.lastname);
+        addPersonStmt.setInt(3, person.age);
+        addPersonStmt.setInt(4, person.heightInMeter);
+        
+        stmt.executeUpdate(addPersonStmt, Statement.RETURN_GENERATED_KEYS);
+    
+        int autoIncKeyFromApi = -1;
+        rs = stmt.getGeneratedKeys();
+        if (rs.next()) {
+            autoIncKeyFromApi = rs.getInt(1); // Jede generierte ID auslesen. In diesem Beispiel wurde nur ein Datenset erstellt.
+        } else {
+            throw new SQLException("Beim INSERT wurde keine Autoincrement-ID generiert");
+        }       
     }
 
     // hier müssen die weiteren Methoden des Interface implementiert
@@ -345,19 +346,28 @@ Hier wird anhand des Parameters *`Statement.RETURN_GENERATED_KEYS`* definiert, d
 using System;
 using System.Data.SqlClient;
 
-class PersonDAOMySQL: IPersonDAO
+class PersonDAOMSSQL: IPersonDAO
 {
-    public int InsertBarista()
+    public addPerson(Person person)
     {
-        string insertQuery = "INSERT INTO COFFEES (COF_NAME, SALES, TOTAL) output INSERTED.ID VALUES ('BARISTA', 0, 0);";
+        // hier wird output INSERTED.ID verwendet, um die ID der eingefügten Person zurückzubekommen (funktioniert aber nur auf MSSQL 2005 und höher) 
+        string addPersonStmt = "INSERT INTO PERSONS (FIRSTNAME, LASTNAME, AGE, HEIGHTINMETER) output INSERTED.ID VALUES (@Firstname, @Lastname, @Age, @HeightInMeter)";
         int autoIncKeyFromApi = -1;
-        using (SqlConnection connection = DbConnector.GetInstance())
+        
+        try
         {
-            // Erstelle das SqlCommand-Objekt für das Einfügen des Baristas
-            using (SqlCommand command = new SqlCommand(insertQuery, connection))
+
+            using (SqlConnection connection = DbConnector.GetInstance())
             {
-                try
+                // Erstelle das SqlCommand-Objekt für das Einfügen des Baristas
+                using (SqlCommand command = new SqlCommand(insertQuery, connection))
                 {
+                    SqlCommand command = new SqlCommand(addPersonStmt, connection);
+                    command.Parameters.AddWithValue("@Firstname", person.Firstname);
+                    command.Parameters.AddWithValue("@Lastname", person.Lastname);
+                    command.Parameters.AddWithValue("@Age", person.Age);
+                    command.Parameters.AddWithValue("@HeightInMeter", person.HeightInMeter);
+
                     // Führe das Einfügen aus und erhalte die generierte ID
                     int autoIncKeyFromApi = Convert.ToInt32(command.ExecuteScalar());
 
@@ -367,6 +377,10 @@ class PersonDAOMySQL: IPersonDAO
                 catch (SqlException ex)
                 {
                     Console.WriteLine("Fehler bei der Datenbankabfrage: " + ex.Message);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Fehler beim Einfügen der Person in die Datenbank: " + e.Message);
                 }
             }
         }
