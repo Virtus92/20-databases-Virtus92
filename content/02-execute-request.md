@@ -74,13 +74,13 @@ class ClientDAOMySQL implements ClientDAO {
 
             // Hier wird das Ergebnis der Abfrage verarbeitet
             while (rs.next()) { // Zugriff auf die nächste Zeile. Wird benötigt, auch wenn das Ergebnis nur 1 Zeile hat!
-                
+
                 // Die Werte werden hier ausschließlich des Verständnisses halber in Variablen gespeichert. Natürlich könnte man die rs.get-Abfragen direkt im "new Client"-Aufruf einsetzen
                 int id = rs.getInt("ID");
                 String firstName = rs.getString("FIRSTNAME"); // Zugriff auf die Spalte mit dem Namen "FIRSTNAME"
                 String lastName = rs.getString("LASTNAME"); // Zugriff auf die Spalte mit dem Namen "LASTNAME"
-                boolean active = rs.getBoolean(3); // Zugriff auf die 3. Spalte laut SELECT: ACTIVE
-                float creditLimit = rs.getFloat(4); // Zugriff auf die 4. Spalte laut SELECT: CREDITLIMIT
+                boolean active = rs.getBoolean(4); // Zugriff auf die 3. Spalte laut SELECT: ACTIVE
+                float creditLimit = rs.getFloat(5); // Zugriff auf die 4. Spalte laut SELECT: CREDITLIMIT
 
                 Client client = new Client(id, firstName, lastName, active, creditLimit);
                 clients.add(client);
@@ -181,6 +181,7 @@ class ClientDAOMSSQL: IClientDAO
         }
         return clients;
     }
+    // hier müssen die weiteren Methoden des Interface implementiert werden
 }
 
 ```
@@ -213,33 +214,33 @@ import java.util.Map;
 import java.util.HashMap;
 
 class ClientDAOMySQL implements ClientDAO{
-    public void deactivateClient(Client client) {
+    public void deactivateClient(Client client) throws SQLException {
         String updateString = "update CLIENTS set ACTIVE = ? where ID = ?";
         String updateStatement = "update CLIENTS set CREDITLIMIT = ? where ID = ?";
         try (PreparedStatement updateActive = DBConnector.getInstance().prepareStatement(updateString);
-            PreparedStatement updateCreditLimit = DBConnector.getInstance().prepareStatement(updateStatement)){
+             PreparedStatement updateCreditLimit = DBConnector.getInstance().prepareStatement(updateStatement)){
 
             // Hier schalten wir den AutoCommit aus, um sicherzustellen, dass unsere beiden Updates im Rahmen einer Transaktion durchgeführt werden und unsere Daten in der Datenbank konsistent bleiben
             DBConnector.getInstance().setAutoCommit(false);
 
-            updateActive.setInt(1, client.active);
-            updateActive.setString(2, client.id);
+            updateActive.setBoolean(1, false);
+            updateActive.setInt(2, client.id);
             updateActive.executeUpdate();
 
-            updateCreditLimit.setInt(1, client.creditLimit);
-            updateCreditLimit.setString(2, client.id);
-            updateCreditLimit.executeUpdate(); 
+            updateCreditLimit.setFloat(1, 0);
+            updateCreditLimit.setInt(2, client.id);
+            updateCreditLimit.executeUpdate();
             DBConnector.getInstance().commit();
         }
         catch(SQLException e){
             DBConnector.getInstance().rollback();
             e.printStackTrace();
         } finally{
-            DBConnector.getInstance().setAutoCommit(true); // Hier schalten wir den AutoCommit wieder ein. 
+            DBConnector.getInstance().setAutoCommit(true); // Hier schalten wir den AutoCommit wieder ein.
         }
     }
 
-    // hier müssen die weiteren Methoden des Interface implementiert
+    // hier müssen die weiteren Methoden des Interface implementiert werden
 }
 ```
 
@@ -295,6 +296,7 @@ class ClientDAOMSSQL: IClientDAO
             Console.WriteLine("Fehler beim Verbinden mit der Datenbank: " + e.Message);
         }
     }
+    // hier müssen die weiteren Methoden des Interface implementiert werden
 }
 ```
 
@@ -324,18 +326,18 @@ import java.util.HashMap;
 
 class ClientDAOMySQL implements ClientDAO {
     public int addClient(Client client) {
-        addClientString = "INSERT INTO CLIENTS (FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT) VALUES (?, ?, ?, ?)";
+        String addClientString = "INSERT INTO CLIENTS (FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT) VALUES (?, ?, ?, ?)";
         int autoIncKeyFromApi = -1;
-        
-        try (PreparedStatement addClientStmt = DBConnector.getInstance().prepareStatement(addClientString)) {
+
+        try (PreparedStatement addClientStmt = DBConnector.getInstance().prepareStatement(addClientString, Statement.RETURN_GENERATED_KEYS)) {
             addClientStmt.setString(1, client.firstname);
             addClientStmt.setString(2, client.lastname);
-            addClientStmt.setInt(3, client.active);
-            addClientStmt.setInt(4, client.creditLimit);
+            addClientStmt.setBoolean(3, client.active);
+            addClientStmt.setFloat(4, client.creditLimit);
 
-            stmt.executeUpdate(addClientStmt, Statement.RETURN_GENERATED_KEYS);
-            
-            rs = stmt.getGeneratedKeys();
+            addClientStmt.executeUpdate();
+
+            ResultSet rs = addClientStmt.getGeneratedKeys();
             if (rs.next()) {
                 autoIncKeyFromApi = rs.getInt(1); // Jede generierte ID auslesen. In diesem Beispiel wurde nur ein Datenset erstellt.
             } else {
@@ -347,10 +349,10 @@ class ClientDAOMySQL implements ClientDAO {
         return autoIncKeyFromApi;
     }
 
-    // hier müssen die weiteren Methoden des Interface implementiert
+    // hier müssen die weiteren Methoden des Interface implementiert werden
 }
 ```
-Hier wird anhand des Parameters *`Statement.RETURN_GENERATED_KEYS`* definiert, dass das Statement die von der Datenbank automatisch definierte ID zurückgegeben wird. Mit *`stmt.getGeneratedKeys()`* kann die ID anschließend genauso abgefragt werden, wie mit einem SELECT-Statement.
+Hier wird anhand des Parameters `Statement.RETURN_GENERATED_KEYS` definiert, dass das Statement die von der Datenbank automatisch definierte ID zurückgegeben wird. Mit *`addClientStmt.getGeneratedKeys()`* kann die ID anschließend so abgefragt werden, wie mit einem SELECT-Statement.
 
 ### C#
 
@@ -399,6 +401,7 @@ class ClientDAOMSSQL: IClientDAO
         }
         return autoIncKeyFromApi;
     }
+    // hier müssen die weiteren Methoden des Interface implementiert werden
 }
 ```
 

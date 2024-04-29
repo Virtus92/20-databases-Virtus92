@@ -94,7 +94,7 @@ public class DBConnector{
     public DBConnector(){
         try{
             Class.forName("com.mysql.cj.jdbc.Driver"); //Driver "com.mysql.cj.jdbc.Driver" laden
-            connection = DriverManager.getConnection(url, user, pass); // Verbindung mit der Datenbank herstellen und in Variable connection speichern
+            connection = DriverManager.getConnection(url, username, password); // Verbindung mit der Datenbank herstellen und in Variable connection speichern
         } catch (Exception e){
             e.printStackTrace();
             throw new SQLException("Database Connection couldn't be established!", e);
