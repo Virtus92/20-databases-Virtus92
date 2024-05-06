@@ -119,6 +119,8 @@ In C# gibt es genauso mehrere Varianten, wie auf eine Datenbank zugegriffen werd
 - *`SqlConnection`*: ist eine API, um mit der jeweiligen Datenbank (in unserem Beispiel MSSQL) zu kommunizieren. Mit *`SqlCommand`* können wir SQL-Abfragen absetzen. Der Hauptvorteil von *`SqlCommand`* ist, dass es am Anfang einfacher ist, zu verstehen und, dass genau das passiert, was der Entwickler anfordert. Aus diesem Grund präsentieren wir es hier.
 - *`Linq`* Mit Linq kann man eine Datenbank in Objekten abbilden. Damit ist mehr automatisiert. Dies ist für Anfänger nicht optimal, um zu verstehen, wie die Arbeit mit Datenbank in C# erfolgt. Daher wird Linq hier nicht näher vorgestellt.
 
+Da C# eine Programmiersprache von Microsoft ist, macht es Sinn auch seitens der Datenbank ein Microsoft-Produkt zu verwenden: [MSSQL Express](https://www.microsoft.com/de-at/sql-server/sql-server-downloads). Natürlich kann man mit C# auch eine MySQL- oder Oracle-Datenbank verwenden!
+
 ```csharp
 // C# 
 using System;
