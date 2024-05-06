@@ -99,6 +99,7 @@ public class DBConnector{
             e.printStackTrace();
             throw new SQLException("Database Connection couldn't be established!", e);
         }
+        connector = this;
     }
 
     public static Connection getInstance() throws SQLException {
@@ -121,41 +122,72 @@ In C# gibt es genauso mehrere Varianten, wie auf eine Datenbank zugegriffen werd
 ```csharp
 // C# 
 using System;
-using System.Data.SqlClient
+using System.Data.SqlClient;
 
-class DBConnection
+namespace J_CS_20_CS_Aufgaben
 {
-    private static DBConnector connector = null;
-    private String serverName = "My Server Name";
-    private dbName = "db_name";
-    private String username = "db_user";
-    private String password = "pw_db_user";
-    private SqlConnection connection;
-    
-    public DBConnector(){
-        try{
-            string connectionString = "Data Source=" + serverName + ";Initial Catalog=" + dbName + ";User ID=" + username + ";Password=" + password + ";";
-            connection = new SqlConnection(connectionString); // Verbindung mit der Datenbank herstellen und in Variable connection speichern
-            connection.Open();
-        } catch (Exception e){
-            e.printStackTrace();
-            throw new SQLException("Database Connection couldn't be established!", e);
-        }
-    }
+    public class DBConnector
+    {
+        private static DBConnector connector = null;
+        private String serverName = "My Server Name";
+        private String dbName = "db_name";
+        private String username = "db_user";
+        private String password = "pw_db_user";
+        private SqlConnection connection;
 
-    public static SqlConnection GetInstance() {
-        if (connector == null){
-            connector = new DBConnector();
-        } else if (connector.connection.State != System.Data.ConnectionState.Open){
-            connector = new DBConnector();
+        public DBConnector()
+        {
+            try
+            {
+                string connectionString = "Data Source=" + serverName + ";Initial Catalog=" + dbName + ";User ID=" + username + ";Password=" + password + ";";
+                connection = new SqlConnection(connectionString); // Verbindung mit der Datenbank herstellen und in Variable connection speichern
+                connection.Open();
+            }
+            catch (Exception e)
+            {
+                e.ToString();
+            }
+            connector = this;
         }
-        return connector.connection;
+
+        public static SqlConnection GetInstance()
+        {
+            if (connector == null)
+            {
+                connector = new DBConnector();
+            }
+            else if (connector.connection != null && connector.connection.State != System.Data.ConnectionState.Open)
+            {
+                connector = new DBConnector();
+            }
+            return connector.connection;
+        }
     }
 }
 ```
 [SqlConnection: Dokumentation](https://learn.microsoft.com/de-de/dotnet/api/system.data.sqlclient.sqlconnection?view=dotnet-plat-ext-8.0)
 
 Hier verwenden wir das Design Pattern `Singleton`.
+
+Um `System.Data.SqlClient` verwenden zu können, muss es im Projekt heruntergeladen werden. Dies erfolgt am einfachsten mit der Paketverwaltung NuGet. Diese öffnet ihr hier:
+
+![NuGet Paketverwaltung öffnen](../img/NuGet Paketverwaltung öffnen.png)
+
+Anschließend wird das Paket `System.Data.SqlClient` gesucht:
+
+![NuGet - System.Data.SqlClient suchen](../img/NuGet%20-%20System.Data.SqlClient-Paket suchen.png)
+
+Schließlich wird das Paket installiert:
+
+![NuGet - System.Data.SqlClient installieren](../img/NuGet%20-%20System.Data.SqlClient installieren.png)
+
+Danach informiert das System potenziell über Änderungen in der Lösung:
+
+![NuGet - Änderungen an der Lösung](../img/NuGet%20-%20Änderungen am Projekt.png)
+
+Zum Schluss müssen den Lizenzbestimmungen zugestimmt werden:
+
+![NuGet - Lizenzbestimmungen zustimmen](../img/NuGet%20-%20Lizenzzustimmung.png)
 
 Mehr Informationen dazu findest du hier: [Refactoring.Guru: Singleton Design Pattern](https://refactoring.guru/design-patterns/singleton/java/example)
 

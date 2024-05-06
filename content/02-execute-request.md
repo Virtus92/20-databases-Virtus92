@@ -124,12 +124,13 @@ Beim Auslesen des Ergebnisses wird darauf geachtet, dass die richtigen Datentype
 
 In C# ist es ähnlich. Wir definieren zuerst unser Interface:
 ```c#
-public interface IClientDAO{
-    public IList<Client> getClientsByLastname(String lastname);
+public interface IClientDAO
+{
+    public IList<Client>? GetClientsByLastname(String lastname);
 
-    public void deactivateClient(Client client);
+    public void DeactivateClient(Client client);
 
-    public void addClient(Client client);  
+    public void AddClient(Client client);
 }
 ```
 
@@ -139,36 +140,36 @@ Der benötigte Objekttyp lautet: *`SqlCommand`* in Kombination mit *`SqlParamete
 ```csharp
 using System;
 using System.Data.SqlClient;
-using System.Linq;
 
 class ClientDAOMSSQL: IClientDAO
 {
-    public IList<Client> GetClientsByLastname(string lastname)
+    public IList<Client>? GetClientsByLastname(string lastname)
     {
         IList<Client> clients = new List<Client>();
         try
         {
             string query = "SELECT ID, FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT FROM CLIENTS WHERE LASTNAME LIKE @Lastname"; // Verwende Platzhalter @Lastname
-
+    
             // Erstelle ein SqlCommand-Objekt mit der Abfrage und der Verbindung
-            using (SqlCommand command = new SqlCommand(query, DbConnector.GetInstance()))
+            using (SqlCommand command = new SqlCommand(query, DBConnector.GetInstance()))
             {
                 // Füge den Parameter für den Nachnamen hinzu
                 command.Parameters.Add(new SqlParameter("@Lastname", System.Data.SqlDbType.VarChar));
                 command.Parameters["@Lastname"].Value = lastname;
-
+    
                 // Führe die Abfrage aus und erhalte ein SqlDataReader-Objekt
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     // Iteriere durch die Ergebnisdaten und verarbeite sie
                     while (reader.Read())
                     {
-                        Client client = new Client(Convert.ToInt32(reader["ID"], 
-                                            reader["FIRSTNAME"].ToString(), 
-                                            reader["LASTNAME"].ToString(), 
-                                            Convert.ToBoolean(reader["ACTIVE"]), 
-                                            Convert.ToDouble(reader["CREDITLIMIT"])
-
+                        Client client = new Client(Convert.ToInt32(reader["ID"]),
+                                            reader["FIRSTNAME"].ToString(),
+                                            reader["LASTNAME"].ToString(),
+                                            Convert.ToBoolean(reader["ACTIVE"]),
+                                            Convert.ToDouble(reader["CREDITLIMIT"]));
+        
+    
                         clients.Add(client);
                     }
                 }
@@ -254,17 +255,19 @@ using System.Data.SqlClient;
 
 class ClientDAOMSSQL: IClientDAO
 {
-    public void deactivateClient(Client client)
+    public void DeactivateClient(Client client)
     {
         string updateActiveString = "update CLIENTS set ACTIVE = @Active WHERE ID = @Id";
         string updateCreditLimitString = "update CLIENTS set CREDITLIMIT = @creditLimit WHERE ID = @Id";
 
-        try{
-            using (SqlConnection connection = DBConnector.Getinstance())
+        try
+        {
+            using (SqlConnection connection = DBConnector.GetInstance())
             {
                 // Beginne eine Transaktion
-                using (SqlTransaction transaction = connection.BeginTransaction()) {
-    
+                using (SqlTransaction transaction = connection.BeginTransaction())
+                {
+
                     try
                     {
                         // Erstes Update ausführen
@@ -291,7 +294,7 @@ class ClientDAOMSSQL: IClientDAO
                 }
             }
         }
-        catch ( Exception e)
+        catch (Exception e)
         {
             Console.WriteLine("Fehler beim Verbinden mit der Datenbank: " + e.Message);
         }
@@ -364,42 +367,42 @@ using System.Data.SqlClient;
 
 class ClientDAOMSSQL: IClientDAO
 {
-    public addClient(Client client)
-    {
-        // hier wird output INSERTED.ID verwendet, um die ID der eingefügten Client zurückzubekommen (funktioniert aber nur auf MSSQL 2005 und höher) 
-        string addClientString = "INSERT INTO CLIENTS (FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT) output INSERTED.ID VALUES (@Firstname, @Lastname, @Active, @CreditLimit)";
-        int autoIncKeyFromApi = -1;
-        
-        try
+        public int AddClient(Client client)
         {
-
-            using (SqlConnection connection = DbConnector.GetInstance())
+            // hier wird output INSERTED.ID verwendet, um die ID der eingefügten Client zurückzubekommen (funktioniert aber nur auf MSSQL 2005 und höher) 
+            string addClientString = "INSERT INTO CLIENTS (FIRSTNAME, LASTNAME, ACTIVE, CREDITLIMIT) output INSERTED.ID VALUES (@Firstname, @Lastname, @Active, @CreditLimit)";
+            int autoIncKeyFromApi = -1;
+            try
             {
-                // Erstelle das SqlCommand-Objekt für das Einfügen des Baristas
-                using (SqlCommand command = new SqlCommand(addClientString, connection))
-                {
-                    command.Parameters.AddWithValue("@Firstname", client.Firstname);
-                    command.Parameters.AddWithValue("@Lastname", client.Lastname);
-                    command.Parameters.AddWithValue("@Active", client.Active);
-                    command.Parameters.AddWithValue("@CreditLimit", client.CreditLimit);
 
-                    // Führe das Einfügen aus und erhalte die generierte ID
-                    int autoIncKeyFromApi = Convert.ToInt32(command.ExecuteScalar());
+                using (SqlConnection connection = DBConnector.GetInstance())
+                {
+                    // Erstelle das SqlCommand-Objekt für das Einfügen des Baristas
+                    using (SqlCommand command = new SqlCommand(addClientString, connection))
+                    {
+                        command.Parameters.AddWithValue("@Firstname", client.Firstname);
+                        command.Parameters.AddWithValue("@Lastname", client.Lastname);
+                        command.Parameters.AddWithValue("@Active", client.Active);
+                        command.Parameters.AddWithValue("@CreditLimit", client.CreditLimit);
 
-                    // Verarbeite die generierte ID
-                    Console.WriteLine("Die generierte ID lautet: " + autoIncKeyFromApi);
-                }
-                catch (SqlException ex)
-                {
-                    Console.WriteLine("Fehler bei der Datenbankabfrage: " + ex.Message);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Fehler beim Einfügen der Client in die Datenbank: " + e.Message);
+                        // Führe das Einfügen aus und erhalte die generierte ID
+                        autoIncKeyFromApi = Convert.ToInt32(command.ExecuteScalar());
+
+                        // Verarbeite die generierte ID
+                        Console.WriteLine("Die generierte ID lautet: " + autoIncKeyFromApi);
+                    }
                 }
             }
+            catch (SqlException ex)
+            {
+                Console.WriteLine("Fehler bei der Datenbankabfrage: " + ex.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Fehler beim Einfügen der Client in die Datenbank: " + e.Message);
+            }
+            return autoIncKeyFromApi;
         }
-        return autoIncKeyFromApi;
     }
     // hier müssen die weiteren Methoden des Interface implementiert werden
 }
