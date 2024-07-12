@@ -7,44 +7,34 @@ public class Main {
     public static void main(String[] args) throws SQLException {
 
         // Zuerst müssen wir eine DAO-Implementierung aussuchen
-        ClientDAO clientPersist = new ClientDAOMySQL();
-        Client newClient = null;
+        ClientDAO clientDAO = new ClientDAOMySQL();
+        Client client1 = null;
 
         try {
-            newClient = new Client("Test1", "test", true, 10000);
-            newClient.id = clientPersist.addClient(newClient);
-
-            Client newClient2 = new Client("Test2", "test", false, 0);
-            newClient2.id = clientPersist.addClient(newClient2);
-
-            Client newClient3 = new Client("Test3", "test3", true, 5000);
-            newClient3.id = clientPersist.addClient(newClient3);
+            client1 = new Client("Bernfried", "Müller", true, 100000);
+            client1.id = clientDAO.addClient(client1);
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
 
         System.out.println();
-        System.out.println("Liste der Clients mit dem Nachnamen 'test':");
+        System.out.println("Liste der Clients mit dem Nachnamen 'Müller':");
 
         try {
-            for (Client client: clientPersist.getClientsByLastname("test")){
+            for (Client client: clientDAO.getClientsByLastname("Müller")){
                 System.out.println(client.toString());
+                clientDAO.deactivateClient(client);
+                System.out.println(client.id + " wurde deaktiviert");
             }
         }catch(Exception e){
             System.out.println(e.getMessage());
         }
 
-        try {
-            clientPersist.deactivateClient(newClient);
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-        }
-
         System.out.println();
-        System.out.println("Liste aller Clients nach Deaktivierung des Clients mit Vornamen 'Test1':");
+        System.out.println("Liste aller Clients nach Deaktivierung:");
 
         try {
-            for (Client client: clientPersist.getAllClients()){
+            for (Client client: clientDAO.getAllClients()){
                 System.out.println(client.toString());
             }
         }catch(Exception e){
@@ -56,8 +46,8 @@ public class Main {
         new Scanner(System.in).nextLine();
 
         try{
-            for (Client client: clientPersist.getAllClients()){
-                clientPersist.deleteCLient(client.id);
+            for (Client client: clientDAO.getAllClients()){
+                clientDAO.deleteClient(client.id);
                 System.out.println(client.toString() + " gelöscht!");
             }
         }catch (Exception e){

@@ -115,7 +115,7 @@ public class ClientDAOMySQL implements ClientDAO{
     }
 
     @Override
-    public void deleteCLient(int id) {
+    public void deleteClient(int id) {
         String deleteClientString = "DELETE FROM CLIENTS WHERE ID = ?";
         int autoIncKeyFromApi = -1;
 
