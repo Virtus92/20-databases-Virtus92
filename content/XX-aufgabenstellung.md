@@ -33,8 +33,9 @@ Der:die Teilnehmer:in hat:
 - Frontend, Business Logic und Datenbankzugriffe ordentlich getrennt.
 - Die Klassen seiner Objekte spezifisch für seine Business Logic erstellt (nicht 1:1 aus der Datenbank).
 - Ein Programm erstellt, das alle oben angeführten Anforderungen erfüllt.
-- in seinem:ihrem Code Exceptions ordentlich abgefangen
-- entsprechende Unittests erstellt, um die Methoden auf Funktionalität zu prüfen
-- seinen:ihren Code in GitHub eingecheckt
+- Ein Programm erstellt, das dem MVC-Design-Pattern entspricht.
+- in seinem:ihrem Code Exceptions ordentlich abgefangen.
+- entsprechende Unittests erstellt, um die Methoden auf Funktionalität zu prüfen.
+- seinen:ihren Code in GitHub eingecheckt.
 
 Zurück zur [Startseite](../README.md)
