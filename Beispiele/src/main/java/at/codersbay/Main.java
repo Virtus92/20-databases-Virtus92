@@ -1,4 +1,4 @@
-package org.example;
+package at.codersbay;
 
 import java.sql.SQLException;
 import java.util.Scanner;

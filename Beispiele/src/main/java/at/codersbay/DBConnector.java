@@ -1,7 +1,6 @@
-package org.example;
+package at.codersbay;
 
 import java.sql.*;
-import java.io.*;
 
 public class DBConnector{
 

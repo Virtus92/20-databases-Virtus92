@@ -1,4 +1,4 @@
-package org.example;
+package at.codersbay;
 
 public class Client {
     public int id;
