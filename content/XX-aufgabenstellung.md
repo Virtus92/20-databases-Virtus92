@@ -33,7 +33,7 @@ Der:die Teilnehmer:in hat:
 - Frontend, Business Logic und Datenbankzugriffe ordentlich getrennt.
 - Die Klassen seiner Objekte spezifisch für seine Business Logic erstellt (nicht 1:1 aus der Datenbank).
 - Ein Programm erstellt, das alle oben angeführten Anforderungen erfüllt.
-- Ein Programm erstellt, das dem MVC-Design-Pattern entspricht.
+- Ein Programm trennt die Klassen in User Interaction/Business Logic/Persistierung.
 - in seinem:ihrem Code Exceptions ordentlich abgefangen.
 - entsprechende Unittests erstellt, um die Methoden auf Funktionalität zu prüfen.
 - seinen:ihren Code in GitHub eingecheckt.
