@@ -1,10 +1,11 @@
-package at.codersbay;
+package main.java.your.packagename;
 
 import java.sql.*;
+import java.io.*;
 
 public class DBConnector{
 
-    private String dbName = "clientmanagement";
+    private String dbName = "java";
     private String username = "root";
     private String password = "";
     private String url = "jdbc:mysql://localhost:3306/" + dbName; //URL zum lokalen MySQL-Server und Datenbank db_name
@@ -19,6 +20,7 @@ public class DBConnector{
             e.printStackTrace();
             throw new SQLException("Database Connection couldn't be established!", e);
         }
+        connector = this;
     }
 
     public static Connection getInstance() throws SQLException {

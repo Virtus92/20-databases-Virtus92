@@ -24,6 +24,7 @@ public class ClientDAOMySQL implements ClientDAO{
                 float creditLimit = rs.getFloat(5); // Zugriff auf die 4. Spalte laut SELECT: CREDITLIMIT
 
                 Client client = new Client(id, firstName, lastName, active, creditLimit);
+                Client client2 = new Client(rs.getInt("ID"), rs.getString("FIRSTNAME"), lastName, active, creditLimit);
                 clients.add(client);
             }
         } catch (SQLException e) {

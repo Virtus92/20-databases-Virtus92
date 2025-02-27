@@ -1,16 +1,7 @@
 package main.java.your.packagename;
 
-import java.util.List;
-
-public class Main {
-    public static void main(String[] args) {
-
-
-
-        //UI Coden mit Manager und Scanner
-
-
-
+public class Testing {
+    public static void testing(String[] args){
 
 //        Delete all
 //                System.out.println(Household.getAllHouseholds());
